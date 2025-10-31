@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical QA Pair Validation Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript" src="https://visjs.github.io/vis-network/standalone/umd/vis-network.min.js"></script>
+    <style type="text/css">
+        #kgVisualization {
+            width: 100%;
+            height: 450px;
+            border: 1px solid #e2e8f0;
+            background-color: #f7fafc;
+            border-radius: 0.375rem;
+        }
+        .highlight { 
+            background-color: #fefcbf; 
+            padding: 0.1rem 0.2rem; 
+            border-radius: 0.25rem; 
+        }
+        #attributionDisplay { 
+            min-height: 110px; 
+        }
+        #attributionDisplay a { 
+            color: #3b82f6; 
+            text-decoration: underline; 
+            font-size: 0.7rem; 
+        }
+        
+        .modal-backdrop {
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0;
+            background-color: rgba(17, 24, 39, 0.7);
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            z-index: 50;
+        }
+        .modal-content {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            width: 90%;
+            max-width: 42rem;
+            max-height: 80vh;
+            display: flex; 
+            flex-direction: column;
+        }
+        .modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            color: #4b5563;
+        }
+        .modal-body h4 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+        .modal-body p {
+            margin-bottom: 1rem;
+        }
+        .modal-body a {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+
+        .nav-circle {
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            background-color: #e5e7eb;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            border: 2px solid transparent;
+        }
+        .nav-circle:hover {
+            background-color: #d1d5db;
+        }
+        .nav-circle.active {
+            background-color: #2563eb;
+            color: white;
+            border-color: #1d4ed8;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans p-4 md:p-8">
+
+    <!-- Confidentiality Notice -->
+    <div class="max-w-7xl mx-auto mb-4">
+        <div class="bg-red-50 border border-red-200 rounded-lg px-4 py-2 text-center">
+            <p class="text-sm font-semibold text-red-800">
+                🔒 Confidential Demo • For Internal Use Only
+            </p>
+        </div>
+    </div>
+
+
+    <div class="max-w-7xl mx-auto bg-white p-6 rounded-lg shadow-md">
+
+        <!-- Logo -->
+        <div class="flex justify-center mb-3">
+                <svg width="400" height="auto" viewBox="0 0 719.45 200" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Generator: Adobe Illustrator 29.1.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 142)  -->
+                    <defs>
+                        <style>
+                        .st0 {
+                        fill: url(#linear-gradient1);
+                    }
+
+                    .st1 {
+                        fill: url(#linear-gradient);
+                    }
+
+                    .st2 {
+                        fill: #142d36;
+                    }
+                    </style>
+                    <linearGradient id="linear-gradient" x1="759.1" y1="-120" x2="860.1" y2="-120" gradientTransform="translate(-212.3 22.4) scale(1 -1)" gradientUnits="userSpaceOnUse">
+                    <stop offset="0" stop-color="#f98200"/>
+                    <stop offset="1" stop-color="#ab5b02"/>
+                    </linearGradient>
+                    <linearGradient id="linear-gradient1" x1="759.1" y1="-104.8" x2="860.1" y2="-104.8" gradientTransform="translate(-212.3 22.4) scale(1 -1)" gradientUnits="userSpaceOnUse">
+                    <stop offset="0" stop-color="#f98200"/>
+                    <stop offset="1" stop-color="#ab5b02"/>
+                    </linearGradient>
+                </defs>
+                <path class="st2" d="M93.6,85.5c0,5.4-4.1,9.9-10.5,9.9s-10.2-4.5-10.2-9.9,4.2-10,10.3-10,10.2,4.3,10.3,10ZM73.9,174v-63.1c0-2.8,2.2-5,5-5h8.4c2.8,0,5,2.2,5,5v63c0,2.8-2.2,5-5,5h-8.4c-2.8,0-5-2.2-5-5Z"/>
+                <path class="st2" d="M117.3,72.5h8.4c2.8,0,5,2.2,5,5v96.5c0,2.8-2.2,5-5,5h-8.4c-2.8,0-5-2.2-5-5v-96.5c0-2.8,2.2-5,5-5Z"/>
+                <path class="st2" d="M155.9,72.5h8.4c2.8,0,5,2.2,5,5v96.5c0,2.8-2.2,5-5,5h-8.4c-2.8,0-5-2.2-5-5v-96.5c0-2.8,2.2-5,5-5Z"/>
+                <path class="st2" d="M254.8,157c0,6.3.2,11.9.4,16.7.1,2.8-2.1,5.2-5,5.2h-6.2c-2.6,0-4.8-2-5-4.6l-.5-6.4h-.4c-3.1,5.1-10.4,12.6-23.6,12.6s-25.4-8-25.4-31.8v-37.9c0-2.8,2.2-5,5-5h8.4c2.8,0,5,2.2,5,5v34.8c0,12.1,3.9,20,13.6,20s12.3-5.1,14.1-9.9c.8-1.5,1.1-3.6,1.1-5.7v-39.1c0-2.8,2.2-5,5-5h8.4c2.8,0,5,2.2,5,5v46.1h0Z"/>
+                <path class="st2" d="M274.8,127.6c0-6.2-.2-11.6-.4-16.5-.1-2.8,2.1-5.2,5-5.2h5.9c2.6,0,4.8,2,5,4.6l.5,6.2h.5c3.5-5.7,10-12.5,22.5-12.5s17.1,5.4,20.2,13.5h.3c2.5-4,5.5-7,8.9-9.1,4.2-2.9,8.9-4.4,15-4.4,12,0,24.3,8.2,24.3,31.6v38c0,2.8-2.2,5-5,5h-8c-2.8,0-5-2.2-5-5v-35.3c0-12.1-4.2-19.4-13-19.4s-11,4.5-12.9,9.8c-.6,1.6-.9,4-.9,6.1v38.8c0,2.8-2.2,5-5,5h-8c-2.8,0-5-2.2-5-5v-37.3c0-10.2-4-17.4-12.6-17.4s-11.5,5.4-13.4,10.4c-.6,2-.9,4-.9,6.1v38.2c0,2.8-2.2,5-5,5h-8c-2.8,0-5-2.2-5-5v-46.3h0Z"/>
+                <path class="st2" d="M421.6,85.5c0,5.4-4,9.9-10.5,9.9s-10.2-4.5-10.2-9.9,4.2-10,10.4-10,10.2,4.3,10.4,10ZM402,174v-63.1c0-2.8,2.2-5,5-5h8.5c2.8,0,5,2.2,5,5v63c0,2.8-2.2,5-5,5h-8.5c-2.8,0-5-2.2-5-5Z"/>
+                <path class="st2" d="M497,161.4c0,4.2.1,8.4.5,12.1.3,2.9-2,5.5-5,5.5h-6.7c-2.4,0-4.5-1.8-4.9-4.2l-.6-3.9h-.5c-4.4,5.7-12,9.7-21.6,9.7-14.7,0-23-10.6-23-21.8,0-18.3,16.4-27.8,43.4-27.6v-1.2c0-4.8-2-12.8-14.9-12.8s-10.3,1.1-14.7,2.9c-2.7,1.1-5.8-.4-6.7-3.2l-.7-2.3c-.7-2.4.5-5,2.8-6,5.5-2.4,13.3-4.4,22.4-4.4,23.4,0,30.1,14.9,30.1,30.9v26.3h0ZM479,148.4c0-2.9-2.4-5.2-5.3-5-10.9.6-20.2,4-20.2,13.5s4.6,10.5,10.5,10.5,12.8-4.8,14.5-10c.5-1.4.5-2.7.5-4v-4.9Z"/>
+                <path class="st2" d="M514.3,168.8c0-6.9,4.8-11.9,11.4-11.9s11.4,4.8,11.4,11.9-4.5,11.8-11.5,11.8-11.3-5.1-11.3-11.8Z"/>
+                <g>
+                    <g>
+                    <path class="st2" d="M608.6,161.4c0,4.2.1,8.4.5,12.1.3,2.9-2,5.5-5,5.5h-6.7c-2.4,0-4.5-1.8-4.9-4.2l-.7-3.9h-.5c-4.3,5.7-12,9.7-21.6,9.7-14.7,0-23-10.6-23-21.8,0-18.3,16.3-27.8,43.3-27.6v-1.2c0-4.8-2-12.8-14.8-12.8s-10.3,1.1-14.7,2.9c-2.7,1.1-5.8-.4-6.7-3.2l-.7-2.3c-.7-2.4.5-5,2.8-6,5.5-2.4,13.3-4.4,22.4-4.4,23.4,0,30.2,14.9,30.2,30.9v26.3h0ZM590.6,148.4c0-2.9-2.4-5.2-5.3-5-10.9.6-20.2,4-20.2,13.5s4.7,10.5,10.5,10.5,12.8-4.8,14.5-10c.5-1.4.5-2.7.5-4v-4.9Z"/>
+                    <path class="st2" d="M647.8,85.5c0,5.4-4,9.9-10.5,9.9s-10.2-4.5-10.2-9.9,4.2-10,10.3-10,10.2,4.3,10.4,10ZM628.1,174v-63.1c0-2.8,2.2-5,5-5h8.5c2.8,0,5,2.2,5,5v63c0,2.8-2.2,5-5,5h-8.5c-2.8,0-5-2.2-5-5Z"/>
+                    </g>
+                    <g>
+                    <path class="st1" d="M608.6,161.4c0,4.2.1,8.4.5,12.1.3,2.9-2,5.5-5,5.5h-6.7c-2.4,0-4.5-1.8-4.9-4.2l-.7-3.9h-.5c-4.3,5.7-12,9.7-21.6,9.7-14.7,0-23-10.6-23-21.8,0-18.3,16.3-27.8,43.3-27.6v-1.2c0-4.8-2-12.8-14.8-12.8s-10.3,1.1-14.7,2.9c-2.7,1.1-5.8-.4-6.7-3.2l-.7-2.3c-.7-2.4.5-5,2.8-6,5.5-2.4,13.3-4.4,22.4-4.4,23.4,0,30.2,14.9,30.2,30.9v26.3h0ZM590.6,148.4c0-2.9-2.4-5.2-5.3-5-10.9.6-20.2,4-20.2,13.5s4.7,10.5,10.5,10.5,12.8-4.8,14.5-10c.5-1.4.5-2.7.5-4v-4.9Z"/>
+                    <path class="st0" d="M647.8,85.5c0,5.4-4,9.9-10.5,9.9s-10.2-4.5-10.2-9.9,4.2-10,10.3-10,10.2,4.3,10.4,10ZM628.1,174v-63.1c0-2.8,2.2-5,5-5h8.5c2.8,0,5,2.2,5,5v63c0,2.8-2.2,5-5,5h-8.5c-2.8,0-5-2.2-5-5Z"/>
+                    </g>
+                </g>
+            </svg>
+        </div>
+
+        <div class="text-center">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-3">Expert Validation for Medical Data</h1>
+            <button onclick="showFullKGModal()" class="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline">
+                🔍 View Related Knowledge Graph
+            </button>
+        </div>
+
+        <div id="navigationSection" class="mt-6 mb-6 pb-6 border-b border-gray-200 flex items-center justify-center gap-2 flex-wrap">
+        </div>
+
+        <div id="questionSection" class="mb-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <h2 class="text-lg font-semibold text-blue-800 mb-2">Question:</h2>
+            <p id="questionText" class="text-gray-700"></p>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-6 mb-8">
+
+            <div class="w-full md:w-1/2 flex flex-col gap-6">
+                <div id="answerPane" class="border border-gray-200 rounded-lg p-4 bg-gray-50 flex-1">
+                     <div class="flex justify-between items-center mb-3 border-b border-gray-200 pb-2">
+                         <h3 class="text-xl font-semibold text-gray-800">Proposed Answer</h3>
+                    </div>
+                    <p id="answerText" class="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap h-[450px] overflow-y-auto pr-2"></p>
+                </div>
+            </div>
+
+            <div class="w-full md:w-1/2 flex flex-col">
+                 <div class="mb-4 relative">
+                    <h4 class="font-semibold text-gray-700 mb-2 text-center">Causal Reasoning Explanation</h4>
+                    <div id="kgVisualization"></div>
+                </div>
+                <div id="attributionDisplay" class="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg h-auto hidden">
+                    <h5 id="attributionTitle" class="font-semibold text-gray-700 text-sm mb-1">Source Attribution for Selected Relation (<span class="font-mono text-xs">N/A</span>):</h5>
+                    <p id="attributionTextDisplay" class="text-xs text-gray-600"></p>
+                </div>
+            </div>
+        </div>
+
+        <div id="decisionSection" class="mt-8 pt-6 border-t border-gray-200 text-center">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Validate Answer</h3>
+            <p class="text-sm text-gray-600 mb-5">Review the proposed answer and its reasoning path. Is this answer correct? Click relations (arrows) for evidence.</p>
+            <div class="flex flex-wrap justify-center gap-2">
+                 <button onclick="recordValidation('correct')" class="min-w-[120px] bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-150 ease-in-out text-sm">Correct</button>
+                 <button onclick="recordValidation('incorrect')" class="min-w-[120px] bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-150 ease-in-out text-sm">Incorrect</button>
+            </div>
+            <div id="saveMessage" class="h-6 mt-2 text-sm text-green-700 font-medium"></div>
+        </div>
+
+    </div>
+
+    <!-- Contact Footer -->
+    <div class="max-w-7xl mx-auto mt-6 mb-4">
+        <div class="bg-white border border-gray-200 rounded-lg px-4 py-3 text-center">
+            <p class="text-sm text-gray-600">
+                💬 Questions? Contact: <a href="mailto:stuli@illumia.ai" class="text-blue-600 hover:text-blue-800 font-medium">stuli@illumia.ai</a>
+            </p>
+        </div>
+    </div>
+
+    <div id="detailModal" class="modal-backdrop hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center p-4 border-b border-gray-200">
+                <h3 class="text-xl font-semibold text-gray-800">Detailed Information</h3>
+                <button onclick="hideModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="modalBody" class="modal-body">
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="fullKGModal" class="modal-backdrop hidden">
+        <div class="modal-content" style="max-width: 80vw; height: 90vh;">
+            <div class="flex justify-between items-center p-4 border-b border-gray-200">
+                <h3 class="text-xl font-semibold text-gray-800">Related Knowledge Graph</h3>
+                <button onclick="hideFullKGModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="fullKGModalBody" class="modal-body" style="padding: 0; flex-grow: 1; position: relative;">
+                <div id="fullKGContainer" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const qaPackages = [
+            // --- PACKAGE 1 ---
+            {
+                id: 1,
+                question: "A 61-year-old man with a 15-year history of type 2 diabetes (T2D) presents for his annual review. His chart notes a significant perinatal history: his mother had gestational diabetes mellitus, and he experienced neonatal hypoglycemia at birth. His known comorbidities include dyslipidemia and persistent microalbuminuria, which was first noted two years ago. On today's evaluation, his blood pressure is 152/94 mmHg, confirming a new diagnosis of hypertension. An ophthalmologic exam last week also revealed new-onset, mild non-proliferative diabetic retinopathy. Given this patient's complete clinical progression and new-onset hypertension, which of the following represents the most direct and imminent progression of his established end-organ damage?<br><br>A. Cerebrovascular accident (Stroke)<br>B. Proliferative diabetic retinopathy<br>C. Progression to established chronic renal disease<br>D. Myocardial infarction",
+                answer: "<strong>Final Answer: C. Progression to established chronic renal disease</strong><br><br>This patient's clinical picture presents a classic, accelerating cascade of diabetic complications, precisely following the knowledge graph path.<br><br><strong>Foundation (Perinatal History):</strong> The patient's in-utero exposure to <strong>gestational diabetes mellitus</strong> (which caused his <strong>neonatal hypoglycemia</strong>) significantly increased his lifetime risk, leading to the development of <strong>type 2 diabetes mellitus</strong> 15 years ago.<br><br><strong>Microvascular Complication (Retinopathy):</strong> His long-standing T2D has now caused a specific microvascular complication: <strong>diabetic retinopathy</strong>. This indicates systemic microvascular damage.<br><br><strong>Associated Systemic Consequence (Hypertension):</strong> The KG path correctly links retinopathy with <strong>hypertension</strong>. The endothelial dysfunction and widespread vascular pathology that cause retinopathy are part of the same process that leads to systemic hypertension, which the patient has now developed.<br><br><strong>Final Downstream Consequence (Renal Disease):</strong> The patient already has <strong>microalbuminuria</strong>, which is the hallmark of early diabetic nephropathy (Stage 3 Chronic Kidney Disease, or GFR-dependent). The addition of new-onset hypertension acts as a powerful accelerator, dramatically increasing the rate of glomerular damage and promoting the progression from microalbuminuria to macroalbuminuria and a definitive, irreversible decline in GFR.<br><br>While options A and D (stroke, MI) are possible macrovascular risks, and option B is a plausible progression of a single complication, the entire cascade (T2D → Retinopathy → Hypertension) points most directly and imminently to the worsening of the already-established kidney damage. The new hypertension will feed directly into the existing microalbuminuria, making the progression to <strong>established chronic renal disease</strong> the most likely next major consequence.",
+                kg_explanation: {
+                    nodes: [
+                        { id: 'n1', label: 'neonatal\nhypoglycaemia' },
+                        { id: 'n2', label: 'gestational\ndiabetes mellitus' },
+                        { id: 'n3', label: 'diabetes\nmellitus' },
+                        { id: 'n4', label: 'retinopathy' },
+                        { id: 'n5', label: 'hypertension' },
+                        { id: 'n6', label: 'chronic\nrenal disease' },
+                        // Context nodes from Full KG - adjacent to main path
+                        { id: 'n7', label: 'obesity', group: 'context' },
+                        { id: 'n8', label: 'stroke', group: 'context' },
+                        { id: 'n9', label: 'fasting blood\nglucose (fbg)', group: 'context' },
+                        { id: 'n10', label: 'podocyte\ninjury', group: 'context' }
+                    ],
+                    edges: [
+                        { from: 'n1', to: 'n2', id: 'e1_2', label: 'due_to', attribution_key: 'nh_gdm' },
+                        { from: 'n2', to: 'n3', id: 'e2_3', label: 'isa', attribution_key: 'gdm_dm' },
+                        { from: 'n3', to: 'n4', id: 'e3_4', label: 'cause_of', attribution_key: 'dm_retinopathy' },
+                        { from: 'n4', to: 'n5', id: 'e4_5', label: 'associated_with', attribution_key: 'retinopathy_htn' },
+                        { from: 'n5', to: 'n6', id: 'e5_6', label: 'associated_with', attribution_key: 'htn_crd' },
+                        // Context edges from Full KG
+                        { from: 'n7', to: 'n5', id: 'e7_5', label: 'due_to', group: 'context', attribution_key: 'htn_obesity' },
+                        { from: 'n8', to: 'n5', id: 'e8_5', label: 'associated_with', group: 'context', attribution_key: 'stroke_htn' },
+                        { from: 'n9', to: 'n3', id: 'e9_3', label: 'associated_with', group: 'context', attribution_key: 'fbg_dm' },
+                        { from: 'n10', to: 'n3', id: 'e10_3', label: 'due_to', group: 'context', attribution_key: 'podo_dm' }
+                    ],
+                    path: {
+                        nodeIds: ['n1', 'n2', 'n3', 'n4', 'n5', 'n6'],
+                        edgeIds: ['e1_2', 'e2_3', 'e3_4', 'e4_5', 'e5_6']
+                    }
+                },
+                attributions: {
+                    'nh_gdm': {
+                        snippet: "...<span class='highlight'>neonatal hypoglycaemia is one of the major metabolic disorders</span>... <span class='highlight'>offspring of diabetic mothers face increased risk of neonatal hypoglycaemia</span>...",
+                        detail: "<h4>neonatal hypoglycaemia --[due_to]--> gestational diabetes mellitus</h4>" +
+                                "<p>...neonatal hypoglycaemia is one of the major metabolic disorders...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/35590270/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/35590270/</a>)</i></p>" +
+                                "<p>...offspring of diabetic mothers face increased risk of neonatal hypoglycaemia ( nh )...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/38849832/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/38849832/</a>)</i></p>"
+                    },
+                    'gdm_dm': {
+                        snippet: "...<span class='highlight'>diabetes mellitus is a severe metabolic disorder, which consistently requires medical care</span>... <span class='highlight'>gestational diabetes mellitus ( gdm ) poses significant health risks to both mothers and infants</span>...",
+                        detail: "<h4>gestational diabetes mellitus --[isa]--> diabetes mellitus</h4>" +
+                                "<p>...diabetes mellitus is a severe metabolic disorder, which consistently requires medical care...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/36078079/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/36078079/</a>)</i></p>" +
+                                "<p>...gestational diabetes mellitus ( gdm ) poses significant health risks to both mothers and infants...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/39408856/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/39408856/</a>)</i></p>"
+                    },
+                    'dm_retinopathy': {
+                        snippet: "...<span class='highlight'>diabetic retinopathy ( dr ) as a microangiopathy is the most common complication in patients with diabetes mellitus</span>... <span class='highlight'>chronic inflammation is a key factor in the development of diabetic retinopathy</span>...",
+                        detail: "<h4>diabetes mellitus --[cause_of]--> retinopathy</h4>" +
+                                "<p>...diabetic retinopathy ( dr ) as a microangiopathy is the most common complication in patients with diabetes mellitus...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/36674535/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/36674535/</a>)</i></p>" +
+                                "<p>...chronic inflammation is a key factor in the development of diabetic retinopathy...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/35285094/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/35285094/</a>)</i></p>"
+                    },
+                    'retinopathy_htn': {
+                        snippet: "...<span class='highlight'>elevated bp was associated with increased odds of retinopathy</span>... <span class='highlight'>h - type hypertension was an independent risk factor of retinopathy</span>...",
+                        detail: "<h4>retinopathy --[associated_with]--> hypertension</h4>" +
+                                "<p>...elevated bp was associated with increased odds of retinopathy ( aor, 19. 13 ; 95 % ci, 8. 52 – 42. 94 ; p < 0. 001 )...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/37883005/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/37883005/</a>)</i></p>" +
+                                "<p>...multivariate analysis showed that after adjusting for age, sex, course of hypertension and diabetes, h - type hypertension was an independent risk factor of retinopathy...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/33407217/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/33407217/</a>)</i></p>"
+                    },
+                    'htn_crd': {
+                        snippet: "...<span class='highlight'>the findings of this study unveiled a substantial correlation between elevated rc, diminished egfr levels, and the risk of developing hypertension</span>...",
+                        detail: "<h4>hypertension --[associated_with]--> chronic renal disease</h4>" +
+                                "<p>...the findings of this study unveiled a substantial correlation between elevated rc, diminished egfr levels, and the risk of developing hypertension...</p><p><i>(Source: <a href='https://pmc.ncbi.nlm.nih.gov/articles/PMC11864924/' target='_blank'>https://pmc.ncbi.nlm.nih.gov/articles/PMC11864924/</a>)</i></p>"
+                    },
+                    'htn_obesity': {
+                        snippet: "...<span class='highlight'>obesity is a major cause of hypertension</span>...",
+                        detail: "<h4>hypertension --[due_to]--> obesity</h4><p>...obesity is a major cause of hypertension, and both are major risk factors for cardiovascular disease...</p><p><i>(Source: <a href='https://pmc.ncbi.nlm.nih.gov/articles/PMC8799839/' target='_blank'>https://pmc.ncbi.nlm.nih.gov/articles/PMC8799839/</a>)</i></p>"
+                    },
+                    'stroke_htn': {
+                        snippet: "...<span class='highlight'>stroke is highly associated with hypertension</span>...",
+                        detail: "<h4>stroke --[associated_with]--> hypertension</h4><p>...in a multivariate cox proportional hazards regression model, the combination of elevated tyg - bmi levels and hypertension, treated as routine variables, was still significantly associated with the risk of stroke...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/39525457/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/39525457/</a>)</i></p>"
+                    },
+                    'fbg_dm': {
+                        snippet: "...<span class='highlight'>fasting blood glucose is associated with diabetes mellitus</span>...",
+                        detail: "<h4>fasting blood glucose (fbg) --[associated_with]--> diabetes mellitus</h4><p>...in this study, we examined the relationship between fasting blood glucose ( fbg ) and 28 - day mortality in coronavirus disease 2019 ( covid - 19 ) patients not previously diagnosed as having diabetes...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/32647915/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/32647915/</a>)</i></p>"
+                    },
+                    'podo_dm': {
+                        snippet: "...<span class='highlight'>podocyte injury is due to diabetes mellitus</span>...",
+                        detail: "<h4>podocyte injury --[due_to]--> diabetes mellitus</h4><p>...in diabetic mice, tnfaip2 deletion exacerbated albuminuria, renal function loss, podocyte injury, and mesangial expansion.</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/35659195/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/35659195/</a>)</i></p>"
+                    }
+                }
+            },
+            // --- PACKAGE 2 ---
+            {
+                id: 2,
+                question: "A 48-year-old woman with a 12-year history of type 2 diabetes, hypertension, and obesity (BMI 34 kg/m²) presents for follow-up. She reports frequently missing her basal insulin doses for the past 6 months. Her labs reveal severe chronic hyperglycemia (HbA1c 10.2%) and a fasting glucose of 285 mg/dL. Given this specific pattern of non-adherence and the resulting sustained glucotoxicity, which of the following represents the primary cellular mechanism that initiates this patient's progression toward advanced diabetic kidney disease?<br><br>A. Systemic activation of the RAAS leading to efferent arteriole vasoconstriction.<br>B. Glucotoxicity-induced injury, effacement, and detachment of glomerular podocytes.<br>C. Non-enzymatic glycation of the tubular basement membrane, leading to interstitial fibrosis.<br>D. Accelerated formation of atherosclerotic plaques within the renal arteries, causing ischemic nephropathy.",
+                answer: "<strong>Final Answer: B. Glucotoxicity-induced injury, effacement, and detachment of glomerular podocytes.</strong><br><br>This patient's clinical picture is defined by sustained, chronic <strong>hyperglycemia</strong>, which is a direct result of her <strong>missed basal insulin doses</strong>. Basal insulin is intended to control hepatic glucose output and maintain euglycemia between meals and overnight. Its absence, confirmed by the high fasting glucose (285 mg/dL) and HbA1c (10.2%), creates a state of persistent glucotoxicity.<br><br>This hyperglycemia is the primary insult. It directly triggers cellular damage within the glomerulus.<br><br>The <strong>podocyte</strong>, a highly specialized epithelial cell that forms the kidney's final filtration barrier, is particularly vulnerable to this glucotoxic state. High glucose levels induce oxidative stress, mitochondrial dysfunction, and inflammation, causing direct <strong>podocyte injury</strong>.<br><br>This injury manifests as the 'effacement' (flattening) of the podocyte foot processes and, critically, their detachment from the glomerular basement membrane. This loss of podocytes is the central, initiating pathology of <strong>diabetic nephropathy (DN)</strong>.<br><br>Once the podocyte barrier is breached, proteins like albumin begin to leak into the urine. This process begins as microalbuminuria and, as seen in this patient's likely progression, advances to <strong>macroalbuminuria</strong> as the structural damage to the glomerulus becomes irreversible, leading toward end-stage renal disease.<br><br>While hypertension and RAAS activation (A) are powerful accelerants of DN, and tubular (C) and ischemic (D) damage also contribute, the glucotoxicity-induced podocyte injury (B) is the primary initiating event in the glomerulus that links this patient's specific metabolic failure to the development of diabetic nephropathy.",
+                kg_explanation: {
+                    nodes: [
+                        { id: 'n1', label: 'missed basal\ninsulin doses' },
+                        { id: 'n2', label: 'hyperglycemia' },
+                        { id: 'n3', label: 'podocyte\ninjury' },
+                        { id: 'n4', label: 'diabetic\nnephropathy' },
+                        { id: 'n5', label: 'dn' },
+                        { id: 'n6', label: 'macroalbuminuria' },
+                        // Context nodes from Full KG - adjacent to main path
+                        { id: 'n7', label: 'diabetes\nmellitus', group: 'context' },
+                        { id: 'n8', label: 'diabetic\ncardiomyopathy', group: 'context' },
+                        { id: 'n9', label: 'ferroptosis', group: 'context' },
+                        { id: 'n10', label: 'ckd\nprogression', group: 'context' }
+                    ],
+                    edges: [
+                        { from: 'n1', to: 'n2', id: 'e1_2', label: 'associated_with', attribution_key: 'insulin_hyper' },
+                        { from: 'n2', to: 'n3', id: 'e2_3', label: 'cause_of', attribution_key: 'hyper_podo' },
+                        { from: 'n3', to: 'n4', id: 'e3_4', label: 'due_to', attribution_key: 'podo_dn' },
+                        { from: 'n4', to: 'n5', id: 'e4_5', label: 'same_as', attribution_key: 'dn_dn' },
+                        { from: 'n5', to: 'n6', id: 'e5_6', label: 'associated_with', attribution_key: 'dn_macro' },
+                        // Context edges from Full KG
+                        { from: 'n3', to: 'n7', id: 'e3_7', label: 'due_to', group: 'context', attribution_key: 'podo_dm' },
+                        { from: 'n2', to: 'n8', id: 'e2_8', label: 'cause_of', group: 'context', attribution_key: 'hyper_dcm' },
+                        { from: 'n9', to: 'n3', id: 'e9_3', label: 'associated_with', group: 'context', attribution_key: 'ferro_podo' },
+                        { from: 'n10', to: 'n4', id: 'e10_4', label: 'due_to', group: 'context', attribution_key: 'ckd_dn' }
+                    ],
+                    path: {
+                        nodeIds: ['n1', 'n2', 'n3', 'n4', 'n5', 'n6'],
+                        edgeIds: ['e1_2', 'e2_3', 'e3_4', 'e4_5', 'e5_6']
+                    }
+                },
+                attributions: {
+                    'insulin_hyper': {
+                        snippet: "...<span class='highlight'>of missing at least one basal insulin dose</span>... <span class='highlight'>post hoc analysis of a prospective, real - world study</span>...",
+                        detail: "<h4>missed basal insulin doses --[associated_with]--> hyperglycemia</h4>" +
+                                "<p>...of missing at least one basal insulin dose...</p><p><i>(Source: <a href='https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10899845/' target='_blank'>https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10899845/</a>)</i></p>" +
+                                "<p>...post hoc analysis of a prospective, real - world study...</p><p><i>(Source: <a href='https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10899845/' target='_blank'>https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10899845/</a>)</i></p>"
+                    },
+                    'hyper_podo': {
+                        snippet: "...<span class='highlight'>podocyte injury induced by hyperglycemia</span>... <span class='highlight'>injury to podocytes</span>...",
+                        detail: "<h4>hyperglycemia --[cause_of]--> podocyte injury</h4>" +
+                                "<p>...nct03403166, nct00000608. podocyte injury induced by hyperglycemia...</p><p><i>(Source: <a href='https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9136128/' target='_blank'>https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9136128/</a>)</i></p>" +
+                                "<p>...nephropathy ( dn ) is a major complication of diabetes. injury to podocytes...</p><p><i>(Source: <a href='https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11093544/' target='_blank'>https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11093544/</a>)</i></p>"
+                    },
+                    'podo_dn': {
+                        snippet: "...<span class='highlight'>podocyte damage in dn</span>... <span class='highlight'>podocyte injury in experimental dn</span>...",
+                        detail: "<h4>podocyte injury --[due_to]--> diabetic nephropathy</h4>" +
+                                "<p>...and other factors contribute to podocyte damage in dn... deletion of sirpα in podocytes exacerbates... podocyte injury in experimental dn...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/39586122/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/39586122/</a>)</i></p>" +
+                                "<p>...( fsgs ) inversely correlate with glycosphingolipid gm3 expression... however, the therapeutic effect of gm3 on diabetic nephropathy...</p><p><i>(Source: <a href='https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10379152/' target='_blank'>https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10379152/</a>)</i></p>"
+                    },
+                    'dn_dn': {
+                        snippet: "...<span class='highlight'>diabetic nephropathy ( dn ), one of the major complications of diabetes</span>...",
+                        detail: "<h4>diabetic nephropathy --[same_as]--> dn</h4>" +
+                                "<p>...interpretations aces are associated with widening inequalities... diabetic nephropathy ( dn ), one of the major complications of diabetes...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/33634991/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/33634991/</a>)</i></p>"
+                    },
+                    'dn_macro': {
+                        snippet: "...<span class='highlight'>nlr and rdw were significantly associated with higher odds of dn</span>... <span class='highlight'>the prevalence of macroalbuminuria increased more abruptly</span>...",
+                        detail: "<h4>dn --[associated_with]--> macroalbuminuria</h4>" +
+                                "<p>...were observed in macro - and microalbuminuria compared to normoalbuminuria... meta - analyses showed that nlr and rdw were significantly associated with higher odds of dn...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/40005333/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/40005333/</a>)</i></p>" +
+                                "<p>...] ) and dn ( or : 0. 962, p = 0. 006 ). the prevalence of dpn and dn increased significantly... and the prevalence of macroalbuminuria increased more abruptly...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/33538508/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/33538508/</a>)</i></p>"
+                    },
+                    'podo_dm': {
+                        snippet: "...<span class='highlight'>podocyte injury induced by diabetes mellitus</span>...",
+                        detail: "<h4>podocyte injury --[due_to]--> diabetes mellitus</h4><p>...in diabetic mice, tnfaip2 deletion exacerbated albuminuria, renal function loss, podocyte injury, and mesangial expansion.</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/35659195/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/35659195/</a>)</i></p>"
+                    },
+                    'hyper_dcm': {
+                        snippet: "...<span class='highlight'>hyperglycemia causes diabetic cardiomyopathy</span>...",
+                        detail: "<h4>hyperglycemia --[cause_of]--> diabetic cardiomyopathy</h4><p>...the pathogenesis of diabetic cardiomyopathy is multifactorial, including inflammatory cascade activation, oxidative / nitrative stress, and the following impaired ca 2 + handling induced by insulin resistance / hyperinsulinemia, hyperglycemia, hyperlipidemia in diabetes...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/31935914/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/31935914/</a>)</i></p>"
+                    },
+                    'ferro_podo': {
+                        snippet: "...<span class='highlight'>ferroptosis is associated with podocyte injury</span>...",
+                        detail: "<h4>ferroptosis --[associated_with]--> podocyte injury</h4><p>...the injury and death of glomerular podocytes are the keys to dkd. currently, a variety of cell death modes have been identified in podocytes, including apoptosis, autophagy... ferroptosis...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/35149303/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/35149303/</a>)</i></p>"
+                    },
+                    'ckd_dn': {
+                        snippet: "...<span class='highlight'>ckd progression is due to diabetic nephropathy</span>...",
+                        detail: "<h4>ckd progression --[due_to]--> diabetic nephropathy</h4><p>...Type 2 diabetic participants with risk factors such as, hyperlipidemia, hypertension, dm duration ≥15 years and diabetic retinopathy showed a high / very high risk of ckd progression...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/36568108/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/36568108/</a>)</i></p>"
+                    }
+                }
+            },
+            // --- PACKAGE 3 ---
+            {
+                id: 3,
+                question: "A 52-year-old woman presents with a 20-year history of poorly controlled type 2 diabetes (HbA1c 9.8%), hypertension, and obesity (BMI 34 kg/m²). Her urinalysis is significant for persistent microalbuminuria (Alb/Cr ratio 150 mg/g). Concerned about the progression of her end-organ damage, her clinician orders a specialized metabolic panel.<br><br>The results show:<br>• Significantly depleted glutathione peroxidase 4 (GPX4) levels<br>• Evidence of cellular iron accumulation<br>• High serum malondialdehyde (MDA)<br><br>Given this patient's specific metabolic and enzymatic profile, which of the following long-term structural changes is most likely being accelerated?<br><br>A. Cardiac remodeling<br>B. Retinal neovascularization<br>C. Peripheral nerve demyelination<br>D. Glomerular basement membrane thickening",
+                answer: "<strong>Final Answer: A. Cardiac remodeling</strong><br><br>This patient's clinical and laboratory data point to a specific, interconnected cascade of cellular injury.<br><br><strong>Identifying the Core Mechanism:</strong> The patient's lab results show the classic triad that defines an active <strong>ferroptosis</strong> pathway:<br>• High malondialdehyde (MDA) indicates significant <strong>lipid peroxidation</strong>, a form of oxidative damage to cell membranes.<br>• Depleted glutathione peroxidase 4 (GPX4) signifies the failure of the primary enzyme that neutralizes these lipid peroxides.<br>• Cellular iron accumulation acts as the catalyst for this reaction, converting lipid hydroperoxides into toxic radicals. This combination confirms ongoing, iron-dependent cell death, or <strong>ferroptosis</strong>.<br><br><strong>Linking Systemic and Renal Damage:</strong> The presence of microalbuminuria is a clinical sign of <strong>podocyte injury</strong>, as these specialized kidney cells are damaged and allow albumin to leak into the urine. Podocytes are known to be highly susceptible to ferroptotic cell death.<br><br><strong>Identifying the Root Cause:</strong> Both the systemic ferroptotic state (seen in the labs) and the specific renal damage (microalbuminuria) are driven by the patient's chronic, severe <strong>hyperglycemia</strong>. The excess glucose overwhelms antioxidant defenses like GPX4, promoting the exact conditions required for ferroptosis.<br><br><strong>Determining the Downstream Consequence:</strong> This same pathological process—hyperglycemia driving ferroptosis—is not confined to the kidneys. It is a well-established driver of <strong>diabetic cardiomyopathy</strong>, a condition where the heart muscle is directly damaged by the metabolic environment. This direct toxicity and cell death in cardiomyocytes (heart muscle cells) initiates a pathological repair process.<br><br><strong>Identifying the Final Structural Change:</strong> The definitive morphological consequence of chronic cardiomyocyte injury from diabetic cardiomyopathy is <strong>cardiac remodeling</strong>. This structural change involves myocardial fibrosis (scarring), left ventricular hypertrophy (thickening), and chamber dilation, all of which progressively lead to heart failure.<br><br>Therefore, the specific enzymatic profile (indicating ferroptosis) in the context of known kidney damage (podocyte injury) points to a systemic, hyperglycemia-driven process that most specifically accelerates <strong>cardiac remodeling</strong>.",
+                kg_explanation: {
+                    nodes: [
+                        { id: 'n1', label: 'lipid\nperoxidation' },
+                        { id: 'n2', label: 'ferroptosis' },
+                        { id: 'n3', label: 'podocyte\ninjury' },
+                        { id: 'n4', label: 'hyperglycemia' },
+                        { id: 'n5', label: 'diabetic\ncardiomyopathy' },
+                        { id: 'n6', label: 'cardiac remodeling' },
+                        // Context nodes from Full KG - adjacent to main path
+                        { id: 'n7', label: 'diabetes\nmellitus', group: 'context' },
+                        { id: 'n8', label: 'diabetic\nnephropathy', group: 'context' },
+                        { id: 'n9', label: 'missed basal\ninsulin doses', group: 'context' }
+                    ],
+                    edges: [
+                        { from: 'n1', to: 'n2', id: 'e1_2', label: 'associated_with', attribution_key: 'lp_ferro' },
+                        { from: 'n2', to: 'n3', id: 'e2_3', label: 'associated_with', attribution_key: 'ferro_podo' },
+                        { from: 'n3', to: 'n4', id: 'e3_4', label: 'due_to', attribution_key: 'podo_hyper' },
+                        { from: 'n4', to: 'n5', id: 'e4_5', label: 'cause_of', attribution_key: 'hyper_dcm' },
+                        { from: 'n5', to: 'n6', id: 'e5_6', label: 'has_associated_morphology', attribution_key: 'dcm_remodel' },
+                        // Context edges from Full KG
+                        { from: 'n3', to: 'n7', id: 'e3_7', label: 'due_to', group: 'context', attribution_key: 'podo_dm' },
+                        { from: 'n3', to: 'n8', id: 'e3_8', label: 'due_to', group: 'context', attribution_key: 'podo_dn' },
+                        { from: 'n9', to: 'n4', id: 'e9_4', label: 'associated_with', group: 'context', attribution_key: 'insulin_hyper' }
+                    ],
+                    path: {
+                        nodeIds: ['n1', 'n2', 'n3', 'n4', 'n5', 'n6'],
+                        edgeIds: ['e1_2', 'e2_3', 'e3_4', 'e4_5', 'e5_6']
+                    }
+                },
+                attributions: {
+                    'lp_ferro': {
+                        snippet: "...<span class='highlight'>ferroptosis, a form of cell death involving reactive oxygen species ( ros ) - dependent lipid peroxidation ( lpo )</span>, is closely linked to autophagy and diabetic complications...",
+                        detail: "<h4>lipid peroxidation --[associated_with]--> ferroptosis</h4>" +
+                                "<p>...ferroptosis, a form of cell death involving reactive oxygen species ( ros ) - dependent lipid peroxidation ( lpo ), is closely linked to autophagy and diabetic complications...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/36566838/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/36566838/</a>)</i></p>" +
+                                "<p>...Iron chelators deferoxamine and dexrazoxane, and lipophilic antioxidants ferrostatin - 1 and liproxstatin - 1 have been revealed to abolish ferroptosis and suppress lipid peroxidation in atherosclerosis, cardiomyopathy, hypertension, and other cvds...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/36622384/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/36622384/</a>)</i></p>"
+                    },
+                    'ferro_podo': {
+                        snippet: "...<span class='highlight'>the injury and death of glomerular podocytes are the keys to dkd. currently, a variety of cell death modes have been identified in podocytes, including apoptosis, autophagy... ferroptosis</span>...",
+                        detail: "<h4>ferroptosis --[associated_with]--> podocyte injury</h4>" +
+                                "<p>...the injury and death of glomerular podocytes are the keys to dkd. currently, a variety of cell death modes have been identified in podocytes, including apoptosis, autophagy... ferroptosis...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/35149303/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/35149303/</a>)</i></p>" +
+                                "<p>...ferroptosis, a new form of cell death, plays a crucial role in the pathogenesis of dn. renal tubular injury triggered by ferroptosis might be essential in this process...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/36627708/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/36627708/</a>)</i></p>"
+                    },
+                    'podo_hyper': {
+                        snippet: "...<span class='highlight'>podocyte injury induced by hyperglycemia is the main cause of kidney dysfunction in diabetic nephropathy</span>. however, the underlying mechanism is unclear...",
+                        detail: "<h4>podocyte injury --[due_to]--> hyperglycemia</h4>" +
+                                "<p>...podocyte injury induced by hyperglycemia is the main cause of kidney dysfunction in diabetic nephropathy. however, the underlying mechanism is unclear...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/29926839/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/29926839/</a>)</i></p>" +
+                                "<p>...however, the fyn inhibitor, azd0530, rescues podocyte injury of ncoa3 knockout dkd mice. renal ncoa3 overexpression with lentivirus can ameliorate podocyte damage and improve podocyte autophagy in dkd mice...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/35278278/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/35278278/</a>)</i></p>"
+                    },
+                    'hyper_dcm': {
+                        snippet: "...<span class='highlight'>the pathogenesis of diabetic cardiomyopathy is multifactorial, including inflammatory cascade activation, oxidative / nitrative stress, and the following impaired ca 2 + handling induced by insulin resistance / hyperinsulinemia, hyperglycemia, hyperlipidemia in diabetes</span>...",
+                        detail: "<h4>hyperglycemia --[cause_of]--> diabetic cardiomyopathy</h4>" +
+                                "<p>...the pathogenesis of diabetic cardiomyopathy is multifactorial, including inflammatory cascade activation, oxidative / nitrative stress, and the following impaired ca 2 + handling induced by insulin resistance / hyperinsulinemia, hyperglycemia, hyperlipidemia in diabetes...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/31935914/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/31935914/</a>)</i></p>" +
+                                "<p>...( 1 ) melatonin regulates glucose and fatty acid metabolism in diabetic cardiomyopathy... ( 10 ) melatonin reduces hyperglycemia, improves insulin resistance, and protects pancreatic β ‐ cells...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/35435165/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/35435165/</a>)</i></p>"
+                    },
+                    'dcm_remodel': {
+                        snippet: "...<span class='highlight'>dm is a leading cause of mortality and morbidity worldwide, with diabetic cardiomyopathy as one of its main complications... electrical and mechanical problems, resulting in cardiac contractile dysfunction, are considered as the major complications present in diabetic hearts</span>...",
+                        detail: "<h4>diabetic cardiomyopathy --[has_associated_morphology]--> cardiac remodeling</h4>" +
+                                "<p>...dm is a leading cause of mortality and morbidity worldwide, with diabetic cardiomyopathy as one of its main complications... electrical and mechanical problems, resulting in cardiac contractile dysfunction, are considered as the major complications present in diabetic hearts...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/35146950/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/35146950/</a>)</i></p>" +
+                                "<p>...function and fibrosis, which may indicate a potential target for the treatment of diabetic cardiomyopathy. introduction myocardial fibrosis and cardiac dysfunction are the main characteristics of diabetic heart disease...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/35146950/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/35146950/</a>)</i></p>"
+                    },
+                    'podo_dm': {
+                        snippet: "...<span class='highlight'>podocyte injury is due to diabetes mellitus</span>...",
+                        detail: "<h4>podocyte injury --[due_to]--> diabetes mellitus</h4><p>...in diabetic mice, tnfaip2 deletion exacerbated albuminuria, renal function loss, podocyte injury, and mesangial expansion.</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/35659195/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/35659195/</a>)</i></p>"
+                    },
+                    'podo_dn': {
+                        snippet: "...<span class='highlight'>podocyte damage in dn</span>... <span class='highlight'>podocyte injury in experimental dn</span>...",
+                        detail: "<h4>podocyte injury --[due_to]--> diabetic nephropathy</h4>" +
+                                "<p>...and other factors contribute to podocyte damage in dn... deletion of sirpα in podocytes exacerbates... podocyte injury in experimental dn...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/39586122/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/39586122/</a>)</i></p>"
+                    },
+                    'insulin_hyper': {
+                        snippet: "...<span class='highlight'>of missing at least one basal insulin dose</span>... <span class='highlight'>post hoc analysis of a prospective, real - world study</span>...",
+                        detail: "<h4>missed basal insulin doses --[associated_with]--> hyperglycemia</h4>" +
+                                "<p>...of missing at least one basal insulin dose...</p><p><i>(Source: <a href='https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10899845/' target='_blank'>https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10899845/</a>)</i></p>"
+                    }
+                }
+            },
+            // --- PACKAGE 4 ---
+            {
+                id: 4,
+                question: "A 68-year-old woman with a 12-year history of type 2 diabetes presents for evaluation. Current comorbidities include smoking (30 pack-year history), hypertriglyceridemia (triglycerides 320 mg/dL), and obesity (BMI 35 kg/m²). Admission laboratory studies show an elevated fasting blood glucose of 198 mg/dL, indicating poor glycemic control. Fundoscopic examination reveals microaneurysms and dot-blot hemorrhages. Blood pressure is measured at 156/92 mmHg.<br><br>Which of the following pathophysiologic processes is most directly linked to this patient's hypertension through her obesity?<br><br>A. Adipose tissue inflammation<br>B. Malignancy<br>C. Cardiovascular disease<br>D. Diabetic ketoacidosis",
+                answer: "<strong>Final Answer: A. Adipose tissue inflammation</strong><br><br>This patient's presentation demonstrates a cascade of metabolic and vascular complications stemming from poorly controlled diabetes, ultimately connecting to inflammatory processes in adipose tissue.<br><br><strong>Metabolic Marker: Elevated Fasting Blood Glucose</strong><br>The patient's <strong>fasting blood glucose (FBG)</strong> of 198 mg/dL is significantly elevated and is associated with <strong>diabetes mellitus</strong>. With a 12-year history of type 2 diabetes, this elevated FBG indicates ongoing poor glycemic control, reflecting chronic hyperglycemia that drives multiple downstream complications.<br><br><strong>Microvascular Complication: Diabetic Retinopathy</strong><br>Long-standing diabetes mellitus is a well-established cause of <strong>retinopathy</strong>. The fundoscopic findings of microaneurysms and dot-blot hemorrhages confirm diabetic retinopathy, representing damage to the small blood vessels of the retina. This microvascular complication reflects the systemic nature of diabetes-induced vascular injury and indicates that similar pathologic processes are likely affecting blood vessels throughout the body.<br><br><strong>Systemic Vascular Consequence: Hypertension</strong><br>The presence of retinopathy is closely associated with <strong>hypertension</strong>. The blood pressure of 156/92 mmHg confirms systemic hypertension in this patient. Several mechanisms link these conditions:<br>• Endothelial dysfunction affecting both retinal and systemic vessels<br>• Increased arterial stiffness from chronic hyperglycemia<br>• Activation of the renin-angiotensin-aldosterone system<br>• Shared microvascular pathology<br><br>The retinal microvascular changes serve as a visible marker of systemic vascular disease, and hypertension both contributes to and results from this widespread vascular damage.<br><br><strong>Underlying Metabolic State: Obesity</strong><br>This patient's hypertension is, in significant part, due to <strong>obesity</strong> (BMI 35 kg/m²). Obesity is a major driver of hypertension through multiple mechanisms:<br>• Increased blood volume and cardiac output<br>• Activation of sympathetic nervous system<br>• Insulin resistance and hyperinsulinemia<br>• Increased renal sodium retention<br>• Mechanical compression of kidneys<br><br>Obesity is present in the majority of type 2 diabetic patients and represents a fundamental metabolic derangement that amplifies cardiovascular risk.<br><br><strong>Downstream Inflammatory Consequence: Adipose Tissue Inflammation</strong><br>Obesity is mechanistically associated with <strong>adipose tissue inflammation</strong> (also called meta-inflammation). In obese individuals, especially those with long-standing diabetes, adipose tissue undergoes pathologic changes:<br>• Adipocyte hypertrophy (enlarged fat cells) leading to hypoxia<br>• Macrophage infiltration of adipose tissue (crown-like structures)<br>• Shift to M1 pro-inflammatory macrophages<br>• Release of inflammatory cytokines (TNF-α, IL-6, IL-1β)<br>• Local and systemic insulin resistance<br>• Production of adipokines (leptin, resistin) promoting inflammation<br><br>This chronic, low-grade inflammatory state in adipose tissue:<br>• Perpetuates insulin resistance<br>• Worsens glycemic control<br>• Accelerates cardiovascular disease<br>• Promotes progression of diabetic complications<br><br>Therefore, following this interconnected cascade—from poor glycemic control (elevated FBG) through vascular complications (retinopathy, hypertension) to the metabolic state of obesity—<strong>adipose tissue inflammation</strong> represents the most likely downstream consequence, functioning as both an outcome of and contributor to this patient's metabolic derangements.",
+                kg_explanation: {
+                    nodes: [
+                        { id: 'n1', label: 'fasting blood\nglucose (fbg)' },
+                        { id: 'n2', label: 'diabetes\nmellitus' },
+                        { id: 'n3', label: 'retinopathy' },
+                        { id: 'n4', label: 'hypertension' },
+                        { id: 'n5', label: 'obesity' },
+                        { id: 'n6', label: 'adipose\ninflammation' },
+                        // Context nodes from Full KG - adjacent to main path
+                        { id: 'n7', label: 'gestational\ndiabetes mellitus', group: 'context' },
+                        { id: 'n8', label: 'podocyte\ninjury', group: 'context' },
+                        { id: 'n9', label: 'postoperative\nwound infection', group: 'context' },
+                        { id: 'n10', label: 'chronic\nrenal disease', group: 'context' },
+                        { id: 'n11', label: 'stroke', group: 'context' },
+                        { id: 'n12', label: 'metabolic\nsyndrome', group: 'context' },
+                        { id: 'n13', label: 'asthma', group: 'context' }
+                    ],
+                    edges: [
+                        { from: 'n1', to: 'n2', id: 'e1_2', label: 'associated_with', attribution_key: 'fbg_dm' },
+                        { from: 'n2', to: 'n3', id: 'e2_3', label: 'cause_of', attribution_key: 'dm_retinopathy' },
+                        { from: 'n3', to: 'n4', id: 'e3_4', label: 'associated_with', attribution_key: 'retinopathy_htn' },
+                        { from: 'n4', to: 'n5', id: 'e4_5', label: 'due_to', attribution_key: 'htn_obesity' },
+                        { from: 'n5', to: 'n6', id: 'e5_6', label: 'associated_with', attribution_key: 'obesity_adipose' },
+                        // Context edges from Full KG
+                        { from: 'n7', to: 'n2', id: 'e7_2', label: 'isa', group: 'context', attribution_key: 'gdm_dm' },
+                        { from: 'n8', to: 'n2', id: 'e8_2', label: 'due_to', group: 'context', attribution_key: 'podo_dm' },
+                        { from: 'n2', to: 'n9', id: 'e2_9', label: 'associated_with', group: 'context', attribution_key: 'dm_wound' },
+                        { from: 'n4', to: 'n10', id: 'e4_10', label: 'associated_with', group: 'context', attribution_key: 'htn_crd' },
+                        { from: 'n11', to: 'n4', id: 'e11_4', label: 'associated_with', group: 'context', attribution_key: 'stroke_htn' },
+                        { from: 'n12', to: 'n5', id: 'e12_5', label: 'has_part', group: 'context', attribution_key: 'ms_obesity' },
+                        { from: 'n5', to: 'n13', id: 'e5_13', label: 'cause_of', group: 'context', attribution_key: 'obesity_asthma' }
+                    ],
+                    path: {
+                        nodeIds: ['n1', 'n2', 'n3', 'n4', 'n5', 'n6'],
+                        edgeIds: ['e1_2', 'e2_3', 'e3_4', 'e4_5', 'e5_6']
+                    }
+                },
+                attributions: {
+                    'fbg_dm': {
+                        snippet: "...<span class='highlight'>in this study, we examined the relationship between fasting blood glucose ( fbg ) and 28 - day mortality in coronavirus disease 2019 ( covid - 19 ) patients not previously diagnosed as having diabetes</span>...",
+                        detail: "<h4>fasting blood glucose (fbg) --[associated_with]--> diabetes mellitus</h4>" +
+                                "<p>...in this study, we examined the relationship between fasting blood glucose ( fbg ) and 28 - day mortality in coronavirus disease 2019 ( covid - 19 ) patients not previously diagnosed as having diabetes...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/32647915/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/32647915/</a>)</i></p>" +
+                                "<p>...diabetes mellitus has been associated with stroke. however, the association between fasting blood glucose ( fbg ) and stroke risk in a general population remains not clear...</p><p><i>(Source: <a href='https://pmc.ncbi.nlm.nih.gov/articles/PMC8375728/' target='_blank'>https://pmc.ncbi.nlm.nih.gov/articles/PMC8375728/</a>)</i></p>"
+                    },
+                    'dm_retinopathy': {
+                        snippet: "...<span class='highlight'>diabetic retinopathy ( dr ) as a microangiopathy is the most common complication in patients with diabetes mellitus</span>... <span class='highlight'>chronic inflammation is a key factor in the development of diabetic retinopathy</span>...",
+                        detail: "<h4>diabetes mellitus --[cause_of]--> retinopathy</h4>" +
+                                "<p>...diabetic retinopathy ( dr ) as a microangiopathy is the most common complication in patients with diabetes mellitus ( dm ) and remains the leading cause of blindness among adult population...</p><p><i>(Source: <a href='https://pmc.ncbi.nlm.nih.gov/articles/PMC9864095/' target='_blank'>https://pmc.ncbi.nlm.nih.gov/articles/PMC9864095/</a>)</i></p>" +
+                                "<p>...diabetes mellitus ( dm ) has shown a trend of reaching pandemic levels in the world. chronic inflammation is a key factor in the development of diabetic retinopathy...</p><p><i>(Source: <a href='https://pmc.ncbi.nlm.nih.gov/articles/PMC8993659/' target='_blank'>https://pmc.ncbi.nlm.nih.gov/articles/PMC8993659/</a>)</i></p>"
+                    },
+                    'retinopathy_htn': {
+                        snippet: "...<span class='highlight'>elevated bp was associated with increased odds of retinopathy</span>... <span class='highlight'>h - type hypertension was an independent risk factor of retinopathy</span>...",
+                        detail: "<h4>retinopathy --[associated_with]--> hypertension</h4>" +
+                                "<p>...elevated bp was associated with increased odds of retinopathy ( aor, 19. 13 ; 95 % ci, 8. 52 – 42. 94 ; p < 0. 001 )...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/37883005/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/37883005/</a>)</i></p>" +
+                                "<p>...multivariate analysis showed that after adjusting for age, sex, course of hypertension and diabetes, h - type hypertension was an independent risk factor of retinopathy...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/33407217/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/33407217/</a>)</i></p>"
+                    },
+                    'htn_obesity': {
+                        snippet: "...<span class='highlight'>obesity can be a major problem due to its potential to cause a number of health issues, including high blood pressure and diabetes</span>... <span class='highlight'>all classes of obese patients were more likely to have hypertension</span>...",
+                        detail: "<h4>hypertension --[due_to]--> obesity</h4>" +
+                                "<p>...obesity can be a major problem due to its potential to cause a number of health issues, including high blood pressure and diabetes...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/35635260/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/35635260/</a>)</i></p>" +
+                                "<p>...all classes of obese patients were more likely to have hypertension ( p < 0. 001 )...</p><p><i>(Source: <a href='https://pmc.ncbi.nlm.nih.gov/articles/PMC10184922/' target='_blank'>https://pmc.ncbi.nlm.nih.gov/articles/PMC10184922/</a>)</i></p>"
+                    },
+                    'obesity_adipose': {
+                        snippet: "...<span class='highlight'>their dysregulation in obesity contributes to chronic low - grade systemic inflammation and metabolic comorbidities</span>... <span class='highlight'>the changes in obese and aging vat are now recognized to be partly driven by a chronic local inflammatory state</span>...",
+                        detail: "<h4>obesity --[associated_with]--> adipose inflammation</h4>" +
+                                "<p>...their dysregulation in obesity contributes to chronic low - grade systemic inflammation and metabolic comorbidities...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/33995281/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/33995281/</a>)</i></p>" +
+                                "<p>...the changes in obese and aging vat are now recognized to be partly driven by a chronic local inflammatory state...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/32499756/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/32499756/</a>)</i></p>"
+                    },
+                    'gdm_dm': {
+                        snippet: "...<span class='highlight'>diabetes mellitus is a severe metabolic disorder, which consistently requires medical care</span>... <span class='highlight'>gestational diabetes mellitus ( gdm ) poses significant health risks to both mothers and infants</span>...",
+                        detail: "<h4>gestational diabetes mellitus --[isa]--> diabetes mellitus</h4>" +
+                                "<p>...diabetes mellitus is a severe metabolic disorder, which consistently requires medical care...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/36078079/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/36078079/</a>)</i></p>" +
+                                "<p>...gestational diabetes mellitus ( gdm ) poses significant health risks to both mothers and infants...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/39408856/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/39408856/</a>)</i></p>"
+                    },
+                    'podo_dm': {
+                        snippet: "...<span class='highlight'>podocyte injury is due to diabetes mellitus</span>...",
+                        detail: "<h4>podocyte injury --[due_to]--> diabetes mellitus</h4><p>...in diabetic mice, tnfaip2 deletion exacerbated albuminuria, renal function loss, podocyte injury, and mesangial expansion.</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/35659195/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/35659195/</a>)</i></p>"
+                    },
+                    'dm_wound': {
+                        snippet: "...<span class='highlight'>multivariate analysis further confirmed these findings, highlighting prolonged operation time and diabetes as significant predictors of pwis</span>...",
+                        detail: "<h4>diabetes mellitus --[associated_with]--> postoperative wound infection</h4>" +
+                                "<p>...multivariate analysis further confirmed these findings, highlighting prolonged operation time and diabetes as significant predictors of pwis, and antibiotic use as a protective factor.</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/38531534/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/38531534/</a>)</i></p>"
+                    },
+                    'htn_crd': {
+                        snippet: "...<span class='highlight'>the findings of this study unveiled a substantial correlation between elevated rc, diminished egfr levels, and the risk of developing hypertension</span>...",
+                        detail: "<h4>hypertension --[associated_with]--> chronic renal disease</h4>" +
+                                "<p>...the findings of this study unveiled a substantial correlation between elevated rc, diminished egfr levels, and the risk of developing hypertension...</p><p><i>(Source: <a href='https://pmc.ncbi.nlm.nih.gov/articles/PMC11864924/' target='_blank'>https://pmc.ncbi.nlm.nih.gov/articles/PMC11864924/</a>)</i></p>"
+                    },
+                    'stroke_htn': {
+                        snippet: "...<span class='highlight'>stroke is highly associated with hypertension</span>...",
+                        detail: "<h4>stroke --[associated_with]--> hypertension</h4><p>...in a multivariate cox proportional hazards regression model, the combination of elevated tyg - bmi levels and hypertension, treated as routine variables, was still significantly associated with the risk of stroke...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/39525457/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/39525457/</a>)</i></p>"
+                    },
+                    'ms_obesity': {
+                        snippet: "...<span class='highlight'>when we divide the metabolic syndrome by its components, high pro - inflammatory diet and hyperglycaemia, tag, hypertension and abdominal obesity... obese people are at increased risk of metabolic syndrome</span>...",
+                        detail: "<h4>metabolic syndrome --[has_part]--> obesity</h4>" +
+                                "<p>...when we divide the metabolic syndrome by its components, high pro - inflammatory diet and hyperglycaemia, tag, hypertension and abdominal obesity... obese people are at increased risk of metabolic syndrome...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/34658314/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/34658314/</a>)</i></p>"
+                    },
+                    'obesity_asthma': {
+                        snippet: "...<span class='highlight'>obesity negatively impacts asthma outcomes and has a causal link in the pathogenesis of adult - onset asthma</span>... <span class='highlight'>obesity increases the morbidity and severity of asthma, with poor sensitivity to corticosteroid treatment</span>...",
+                        detail: "<h4>obesity --[cause_of]--> asthma</h4>" +
+                                "<p>...obesity negatively impacts asthma outcomes and has a causal link in the pathogenesis of adult - onset asthma.</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/34921631/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/34921631/</a>)</i></p>" +
+                                "<p>...obesity increases the morbidity and severity of asthma, with poor sensitivity to corticosteroid treatment.</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/33421348/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/33421348/</a>)</i></p>"
+                    }
+                }
+            },
+            // --- PACKAGE 5 ---
+            {
+                id: 5,
+                question: "A 68-year-old woman with a 15-year history of type 2 diabetes presents for evaluation. Current comorbidities include hypertension (BP 148/88 mmHg) and obesity (BMI 34 kg/m²). Abdominal CT with contrast reveals a 3.2 cm arterially enhancing liver lesion with washout, consistent with hepatocellular carcinoma (HCC). Additional imaging shows a nodular liver contour, splenomegaly, and ascites. The patient has no history of alcohol use, viral hepatitis, or other liver disease risk factors. Which of the following is the most likely additional downstream consequence in this patient?<br><br>A. Progressive metabolic dysfunction<br>B. Left ventricular hypertrophy<br>C. Cardiovascular disease events<br>D. Sarcopenia",
+                answer: "<strong>Final Answer: C. Cardiovascular disease events</strong><br><br>This patient's presentation requires tracing backward from her hepatic malignancy to identify its root cause, then projecting forward to predict the most significant downstream consequence.<br><br><strong>Clinical Presentation: NAFLD-Related Hepatocellular Carcinoma</strong><br>The patient presents with <strong>hepatocellular carcinoma (HCC)</strong>, specifically a 3.2 cm arterially enhancing lesion with washout on contrast CT. Given her metabolic profile and absence of viral hepatitis or alcohol use, this is <strong>NAFLD-related hepatocellular carcinoma</strong>. This designation is critical because it identifies the underlying metabolic etiology rather than viral or toxic causes.<br><br><strong>Associated Hepatic Condition: Cirrhosis</strong><br>NAFLD-related HCC is strongly associated with <strong>cirrhosis</strong>. The imaging findings confirm this association:<br>• Nodular liver contour (cirrhotic morphology)<br>• Splenomegaly (portal hypertension)<br>• Ascites (hepatic decompensation)<br><br>HCC in NAFLD almost universally arises in the setting of cirrhosis. These two conditions are intimately linked - cirrhosis provides the substrate of chronic inflammation, regenerative nodules, and genetic instability that enables malignant transformation.<br><br><strong>Underlying Causative Agent: NAFLD</strong><br>The cirrhosis observed in this patient has <strong>NAFLD</strong> as its causative agent. This represents the etiologic diagnosis - the root cause of her liver disease. The progression was:<br>• Non-alcoholic fatty liver disease (NAFLD)<br>• → Non-alcoholic steatohepatitis (NASH - inflammatory progression)<br>• → Progressive fibrosis<br>• → Cirrhosis (stage 4 fibrosis)<br>• → Hepatocellular carcinoma<br><br><strong>Pathologic Characteristic: Fatty Liver</strong><br>NAFLD is definitionally <strong>characterized by fatty liver</strong> (hepatic steatosis). This refers to the pathologic accumulation of triglycerides in hepatocytes (>5% of liver weight or volume). This hepatic fat accumulation represents the initial and defining feature of NAFLD.<br><br><strong>Systemic Metabolic Context: Metabolic Syndrome</strong><br>Fatty liver disease in this patient is strongly associated with <strong>metabolic syndrome</strong>. She demonstrates the complete diagnostic constellation:<br>• Central obesity (BMI 34 kg/m²)<br>• Impaired fasting glucose/diabetes (15-year history)<br>• Hypertension (BP 148/88 mmHg)<br>• Dyslipidemia (likely present)<br>• NAFLD (the hepatic manifestation)<br><br>Metabolic syndrome represents a cluster of interconnected cardiometabolic abnormalities driven by insulin resistance, visceral adiposity, chronic inflammation, oxidative stress, and endothelial dysfunction.<br><br><strong>Critical Downstream Consequence: Cardiovascular Disease</strong><br>Metabolic syndrome is a well-established and powerful cause of <strong>cardiovascular diseases</strong>. This represents the most significant downstream consequence for this patient.<br><br><strong>Why Cardiovascular Disease is the Primary Concern:</strong><br><br><em>1. Shared Pathophysiologic Mechanisms:</em> NAFLD and cardiovascular disease share common metabolic and inflammatory pathways including insulin resistance, atherogenic dyslipidemia, chronic inflammation, endothelial dysfunction, and oxidative stress.<br><br><em>2. NAFLD as Independent CVD Risk Factor:</em> Beyond traditional metabolic syndrome components, NAFLD itself independently predicts cardiovascular events with 1.5-2x increased risk even after adjusting for traditional risk factors.<br><br><em>3. Competing Mortality Risks:</em> In patients with NAFLD-related cirrhosis, cardiovascular disease accounts for ~40% of deaths, often competing with or exceeding liver-related mortality.<br><br><em>4. Patient-Specific Risk Amplification:</em><br>• 15 years of diabetes: Cumulative glycemic burden causing advanced vascular damage<br>• Hypertension: Target organ damage (heart, brain, kidneys)<br>• Obesity: Mechanical stress, inflammation, altered hemodynamics<br>• Age 68: Increased baseline cardiovascular risk<br><br><strong>Expected Cardiovascular Disease Manifestations:</strong><br>• Coronary artery disease: Angina, myocardial infarction<br>• Cerebrovascular disease: Ischemic stroke, TIA<br>• Heart failure: Particularly diastolic dysfunction<br>• Atrial fibrillation<br>• Peripheral arterial disease<br>• Sudden cardiac death<br><br>Therefore, by tracing backward from her hepatic presentation to its metabolic roots, then projecting forward based on the systemic nature of metabolic syndrome, <strong>cardiovascular disease events</strong> represent the most likely and clinically significant downstream consequence.",
+                kg_explanation: {
+                    nodes: [
+                        { id: 'n1', label: 'nafld - related\nhepatocellular\ncarcinoma' },
+                        { id: 'n2', label: 'cirrhosis' },
+                        { id: 'n3', label: 'nafld' },
+                        { id: 'n4', label: 'fatty\nliver' },
+                        { id: 'n5', label: 'metabolic\nsyndrome' },
+                        { id: 'n6', label: 'cardiovascular\ndiseases' },
+                        // Context nodes from Full KG - adjacent to main path
+                        { id: 'n7', label: 'hepatic\nfibrosis', group: 'context' },
+                        { id: 'n8', label: 'obesity', group: 'context' },
+                        { id: 'n9', label: 'mets', group: 'context' }
+                    ],
+                    edges: [
+                        { from: 'n1', to: 'n2', id: 'e1_2', label: 'associated_with', attribution_key: 'hcc_cirrhosis' },
+                        { from: 'n2', to: 'n3', id: 'e2_3', label: 'has_causative_agent', attribution_key: 'cirrhosis_nafld' },
+                        { from: 'n3', to: 'n4', id: 'e3_4', label: 'characterized_by', attribution_key: 'nafld_fatty' },
+                        { from: 'n4', to: 'n5', id: 'e4_5', label: 'associated_with', attribution_key: 'fatty_ms' },
+                        { from: 'n5', to: 'n6', id: 'e5_6', label: 'cause_of', attribution_key: 'ms_cvd' },
+                        // Context edges from Full KG
+                        { from: 'n7', to: 'n3', id: 'e7_3', label: 'associated_with', group: 'context', attribution_key: 'fibrosis_nafld' },
+                        { from: 'n5', to: 'n8', id: 'e5_8', label: 'has_part', group: 'context', attribution_key: 'ms_obesity' },
+                        { from: 'n5', to: 'n9', id: 'e5_9', label: 'same_as', group: 'context', attribution_key: 'ms_mets' }
+                    ],
+                    path: {
+                        nodeIds: ['n1', 'n2', 'n3', 'n4', 'n5', 'n6'],
+                        edgeIds: ['e1_2', 'e2_3', 'e3_4', 'e4_5', 'e5_6']
+                    }
+                },
+                attributions: {
+                    'hcc_cirrhosis': {
+                        snippet: "...<span class='highlight'>nafld - related hepatocellular carcinoma is associated with a higher proportion of patients without cirrhosis and lower surveillance rates than hepatocellular carcinoma due</span>...",
+                        detail: "<h4>nafld - related hepatocellular carcinoma --[associated_with]--> cirrhosis</h4>" +
+                                "<p>...nafld - related hepatocellular carcinoma is associated with a higher proportion of patients without cirrhosis and lower surveillance rates than hepatocellular carcinoma due...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/35255263/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/35255263/</a>)</i></p>" +
+                                "<p>...comparison of patient and tumour characteristics of nafld - related hepatocellular carcinoma versus other causes...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/35255263/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/35255263/</a>)</i></p>"
+                    },
+                    'cirrhosis_nafld': {
+                        snippet: "...<span class='highlight'>the highest annual increase in asdr and asyllr for cirrhosis was due to ald ( apc, 3. 24 % and 3. 34 %, respectively ) followed by nafld</span>...",
+                        detail: "<h4>cirrhosis --[has_causative_agent]--> nafld</h4>" +
+                                "<p>...the highest annual increase in asdr and asyllr for cirrhosis was due to ald ( apc, 3. 24 % and 3. 34 %, respectively ) followed by nafld...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/32490324/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/32490324/</a>)</i></p>"
+                    },
+                    'nafld_fatty': {
+                        snippet: "...<span class='highlight'>non - alcoholic fatty liver disease ( nafld ), entails fat accumulation in the liver without alcohol consumption and is often linked to obesity, insulin resistance, and metabolic syndrome</span>...",
+                        detail: "<h4>nafld --[characterized_by]--> fatty liver</h4>" +
+                                "<p>...non - alcoholic fatty liver disease ( nafld ), entails fat accumulation in the liver without alcohol consumption and is often linked to obesity, insulin resistance, and metabolic syndrome.</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/38862756/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/38862756/</a>)</i></p>" +
+                                "<p>...metabolic - ( dysfunction ) associated fatty liver disease ( mafld ) is a more appropriate term to describe the disease than nafld...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/35806284/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/35806284/</a>)</i></p>"
+                    },
+                    'fatty_ms': {
+                        snippet: "...<span class='highlight'>these patients had higher risks of metabolic syndrome ( mets ), type 2 diabetes mellitus ( t2dm ), and hypertension</span>...",
+                        detail: "<h4>fatty liver --[associated_with]--> metabolic syndrome</h4>" +
+                                "<p>...these patients had higher risks of metabolic syndrome ( mets ), type 2 diabetes mellitus ( t2dm ), and hypertension...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/34918746/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/34918746/</a>)</i></p>"
+                    },
+                    'ms_cvd': {
+                        snippet: "...<span class='highlight'>the risk of cardiovascular diseases is heightened by the presence of a risk factor cluster of metabolic syndrome</span>... <span class='highlight'>it increases the risk of cardiovascular disorder and stroke by three to ten times</span>...",
+                        detail: "<h4>metabolic syndrome --[cause_of]--> cardiovascular diseases</h4>" +
+                                "<p>...the risk of cardiovascular diseases is heightened by the presence of a risk factor cluster of metabolic syndrome...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/37569362/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/37569362/</a>)</i></p>" +
+                                "<p>...it increases the risk of cardiovascular disorder and stroke by three to ten times...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/39213318/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/39213318/</a>)</i></p>"
+                    },
+                    'fibrosis_nafld': {
+                        snippet: "...<span class='highlight'>confirmed a positive correlation between the degree of hepatic fibrosis and the sdldl / ldl ratio</span>... <span class='highlight'>muscle mass adjusted for body weight was associated with nafld... and hepatic fibrosis</span>...",
+                        detail: "<h4>hepatic fibrosis --[associated_with]--> nafld</h4>" +
+                                "<p>...confirmed a positive correlation between the degree of hepatic fibrosis and the sdldl / ldl ratio...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/36123875/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/36123875/</a>)</i></p>" +
+                                "<p>...muscle mass adjusted for body weight was associated with nafld... and hepatic fibrosis...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/34875824/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/34875824/</a>)</i></p>"
+                    },
+                    'ms_obesity': {
+                        snippet: "...<span class='highlight'>when we divide the metabolic syndrome by its components, high pro - inflammatory diet and hyperglycaemia, tag, hypertension and abdominal obesity... obese people are at increased risk of metabolic syndrome</span>...",
+                        detail: "<h4>metabolic syndrome --[has_part]--> obesity</h4>" +
+                                "<p>...when we divide the metabolic syndrome by its components, high pro - inflammatory diet and hyperglycaemia, tag, hypertension and abdominal obesity... obese people are at increased risk of metabolic syndrome...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/34658314/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/34658314/</a>)</i></p>"
+                    },
+                    'ms_mets': {
+                        snippet: "...<span class='highlight'>conclusions in the present long - term follow - up study, the presence of mets, but not obesity only, implies a greater risk of mortality and cvd</span>... <span class='highlight'>metabolic syndrome ( mets ) is a cluster of several disorders, such as hypertension, central obesity, dyslipidemia, hyperglycemia, insulin resistance and non - alcoholic fatty liver disease</span>...",
+                        detail: "<h4>metabolic syndrome --[same_as]--> mets</h4>" +
+                                "<p>...conclusions in the present long - term follow - up study, the presence of mets, but not obesity only, implies a greater risk of mortality and cvd...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/35594302/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/35594302/</a>)</i></p>" +
+                                "<p>...metabolic syndrome ( mets ) is a cluster of several disorders, such as hypertension, central obesity, dyslipidemia, hyperglycemia, insulin resistance and non - alcoholic fatty liver disease...</p><p><i>(Source: <a href='https://pmc.ncbi.nlm.nih.gov/articles/PMC8267891/' target='_blank'>https://pmc.ncbi.nlm.nih.gov/articles/PMC8267891/</a>)</i></p>"
+                    }
+                }
+            }
+        ];
+
+        const fullKnowledgeGraph = {
+            nodes: [
+                // Package 1 - all unique nodes
+                { id: 'full_n1', label: 'neonatal\nhypoglycaemia' },
+                { id: 'full_n2', label: 'gestational\ndiabetes mellitus' },
+                { id: 'full_n3', label: 'diabetes\nmellitus' },
+                { id: 'full_n4', label: 'retinopathy' },
+                { id: 'full_n5', label: 'hypertension' },
+                { id: 'full_n6', label: 'chronic\nrenal disease' },
+                
+                // Package 2 - all unique nodes
+                { id: 'full_n7', label: 'missed basal\ninsulin doses' },
+                { id: 'full_n8', label: 'hyperglycemia' },
+                { id: 'full_n9', label: 'podocyte\ninjury' },
+                { id: 'full_n10', label: 'diabetic\nnephropathy' },
+                { id: 'full_n11', label: 'dn' },
+                { id: 'full_n12', label: 'macroalbuminuria' },
+                
+                // Package 3 - all unique nodes
+                { id: 'full_n13', label: 'lipid\nperoxidation' },
+                { id: 'full_n14', label: 'ferroptosis' },
+                { id: 'full_n15', label: 'diabetic\ncardiomyopathy' },
+                { id: 'full_n16', label: 'cardiac remodeling' },
+                
+                // Package 4 - all unique nodes
+                { id: 'full_n17', label: 'fasting blood\nglucose (fbg)' },
+                { id: 'full_n18', label: 'obesity' },
+                { id: 'full_n19', label: 'adipose\ninflammation' },
+                
+                // Package 5 - all unique nodes
+                { id: 'full_n20', label: 'ckd\nprogression' },
+                { id: 'full_n21', label: 'postoperative\nwound infection' },
+                
+                // Package 6 - all unique nodes
+                { id: 'full_n22', label: 'hepatic\nfibrosis' },
+                { id: 'full_n23', label: 'nafld' },
+                { id: 'full_n24', label: 'fatty\nliver' },
+                { id: 'full_n25', label: 'metabolic\nsyndrome' },
+                { id: 'full_n26', label: 'asthma' },
+                
+                // Package 7 - all unique nodes
+                { id: 'full_n27', label: 'nafld - related\nhepatocellular\ncarcinoma' },
+                { id: 'full_n28', label: 'cirrhosis' },
+                { id: 'full_n29', label: 'cardiovascular\ndiseases' },
+                
+                // Package 8 - all unique nodes
+                { id: 'full_n30', label: 'diabetes -\nspecific qol' },
+                { id: 'full_n31', label: 'hypoglycemia' },
+                { id: 'full_n32', label: 'insulinoma' },
+                { id: 'full_n33', label: 'insulin' },
+                { id: 'full_n34', label: 'neuroprotective' },
+                
+                // Package 9 - all unique nodes
+                { id: 'full_n35', label: 'sarcopenic\nobesity' },
+                { id: 'full_n36', label: 'stroke' },
+                
+                // Package 10 - all unique nodes
+                { id: 'full_n37', label: 'metabolically\nunhealthy obese\n(muo)' },
+                { id: 'full_n38', label: 'mets' },
+                { id: 'full_n39', label: 'kidney\ndisease' }
+            ],
+            edges: [
+                // Package 1 edges (CSV: neonatal hypoglycaemia -> gestational diabetes mellitus -> diabetes mellitus -> retinopathy -> hypertension -> chronic renal disease)
+                { id: 'full_e1', from: 'full_n1', to: 'full_n2', label: 'due_to' },
+                { id: 'full_e2', from: 'full_n2', to: 'full_n3', label: 'isa' },
+                { id: 'full_e3', from: 'full_n3', to: 'full_n4', label: 'cause_of' },
+                { id: 'full_e4', from: 'full_n4', to: 'full_n5', label: 'associated_with' },
+                { id: 'full_e5', from: 'full_n5', to: 'full_n6', label: 'associated_with' },
+                
+                // Package 2 edges (CSV: missed basal insulin doses -> hyperglycemia -> podocyte injury -> diabetic nephropathy -> dn -> macroalbuminuria)
+                { id: 'full_e6', from: 'full_n7', to: 'full_n8', label: 'associated_with' },
+                { id: 'full_e7', from: 'full_n8', to: 'full_n9', label: 'cause_of' },
+                { id: 'full_e8', from: 'full_n9', to: 'full_n10', label: 'due_to' },
+                { id: 'full_e9', from: 'full_n10', to: 'full_n11', label: 'same_as' },
+                { id: 'full_e10', from: 'full_n11', to: 'full_n12', label: 'associated_with' },
+                
+                // Package 3 edges (CSV: lipid peroxidation -> ferroptosis -> podocyte injury -> hyperglycemia -> diabetic cardiomyopathy -> cardiac remodeling)
+                { id: 'full_e11', from: 'full_n13', to: 'full_n14', label: 'associated_with' },
+                { id: 'full_e12', from: 'full_n14', to: 'full_n9', label: 'associated_with' },
+                { id: 'full_e13', from: 'full_n9', to: 'full_n8', label: 'due_to' },
+                { id: 'full_e14', from: 'full_n8', to: 'full_n15', label: 'cause_of' },
+                { id: 'full_e15', from: 'full_n15', to: 'full_n16', label: 'has_associated_morphology' },
+                
+                // Package 4 edges (CSV: fbg -> diabetes mellitus -> retinopathy -> hypertension -> obesity -> adipose inflammation)
+                { id: 'full_e16', from: 'full_n17', to: 'full_n3', label: 'associated_with' },
+                { id: 'full_e17', from: 'full_n5', to: 'full_n18', label: 'due_to' },
+                { id: 'full_e18', from: 'full_n18', to: 'full_n19', label: 'associated_with' },
+                
+                // Package 5 edges (CSV: ckd progression -> diabetic nephropathy -> dn -> podocyte injury -> diabetes mellitus -> postoperative wound infection)
+                { id: 'full_e19', from: 'full_n20', to: 'full_n10', label: 'due_to' },
+                { id: 'full_e20', from: 'full_n11', to: 'full_n9', label: 'has_associated_morphology' },
+                { id: 'full_e21', from: 'full_n9', to: 'full_n3', label: 'due_to' },
+                { id: 'full_e22', from: 'full_n3', to: 'full_n21', label: 'associated_with' },
+                
+                // Package 6 edges (CSV: hepatic fibrosis -> nafld -> fatty liver -> metabolic syndrome -> obesity -> asthma)
+                { id: 'full_e23', from: 'full_n22', to: 'full_n23', label: 'associated_with' },
+                { id: 'full_e24', from: 'full_n23', to: 'full_n24', label: 'characterized_by' },
+                { id: 'full_e25', from: 'full_n24', to: 'full_n25', label: 'associated_with' },
+                { id: 'full_e26', from: 'full_n25', to: 'full_n18', label: 'has_part' },
+                { id: 'full_e27', from: 'full_n18', to: 'full_n26', label: 'cause_of' },
+                
+                // Package 7 edges (CSV: nafld-related HCC -> cirrhosis -> nafld -> fatty liver -> metabolic syndrome -> cardiovascular diseases)
+                { id: 'full_e28', from: 'full_n27', to: 'full_n28', label: 'associated_with' },
+                { id: 'full_e29', from: 'full_n28', to: 'full_n23', label: 'has_causative_agent' },
+                { id: 'full_e30', from: 'full_n25', to: 'full_n29', label: 'cause_of' },
+                
+                // Package 8 edges (CSV: diabetes-specific qol -> hypoglycemia -> insulinoma -> insulin -> neuroprotective)
+                { id: 'full_e31', from: 'full_n30', to: 'full_n31', label: 'associated_with' },
+                { id: 'full_e32', from: 'full_n31', to: 'full_n32', label: 'due_to' },
+                { id: 'full_e33', from: 'full_n32', to: 'full_n33', label: 'associated_with' },
+                { id: 'full_e34', from: 'full_n33', to: 'full_n34', label: 'plays_role' },
+                
+                // Package 9 edges (CSV: sarcopenic obesity -> obesity -> stroke -> hypertension -> chronic renal disease)
+                { id: 'full_e35', from: 'full_n35', to: 'full_n18', label: 'isa' },
+                { id: 'full_e36', from: 'full_n18', to: 'full_n36', label: 'cause_of' },
+                { id: 'full_e37', from: 'full_n36', to: 'full_n5', label: 'associated_with' },
+                
+                // Package 10 edges (CSV: muo -> metabolic syndrome -> mets -> obesity -> kidney disease)
+                { id: 'full_e38', from: 'full_n37', to: 'full_n25', label: 'associated_with' },
+                { id: 'full_e39', from: 'full_n25', to: 'full_n38', label: 'same_as' },
+                { id: 'full_e40', from: 'full_n38', to: 'full_n18', label: 'associated_with' },
+                { id: 'full_e41', from: 'full_n18', to: 'full_n39', label: 'cause_of' }
+            ]
+        };
+
+        let currentPackageIndex = 0;
+        let network = null;
+        let fullNetwork = null;
+        let currentAttributions = {};
+        const nodesDataSet = new vis.DataSet();
+        const edgesDataSet = new vis.DataSet();
+        let activePathData = {};
+        let currentlySelectedEdgeId = null;
+
+        const questionTextEl = document.getElementById('questionText');
+        const answerTextEl = document.getElementById('answerText');
+        const kgContainer = document.getElementById('kgVisualization');
+        const attributionDisplayEl = document.getElementById('attributionDisplay');
+        const attributionTextDisplayEl = document.getElementById('attributionTextDisplay');
+        const attributionTitleEl = document.getElementById('attributionTitle');
+        const saveMessageEl = document.getElementById('saveMessage');
+        const navCirclesContainerEl = document.getElementById('navigationSection');
+        const modalEl = document.getElementById('detailModal');
+        const modalBodyEl = document.getElementById('modalBody');
+        const fullKGModalEl = document.getElementById('fullKGModal');
+        const fullKGContainerEl = document.getElementById('fullKGContainer');
+
+        const styles = {
+            nodes: {
+                pathActive: { color: { border: '#16a34a', background: '#f0fdf4' }, borderWidth: 2, opacity: 1, font: { color: '#374151'} },
+                default: { color: { background: '#f3f4f6', border: '#d1d5db' }, opacity: 0.6, font: { color: '#9ca3af' }, borderWidth: 1 },
+                muted: { opacity: 0.3, color: { border: '#e5e7eb', background: '#f9fafb'}, font: {color: '#d1d5db'}, borderWidth: 1 }
+            },
+            edges: {
+                baseFont: { size: 9, align: 'middle', strokeWidth: 0, background: 'rgba(247, 250, 252, 0.7)' },
+                pathActive: { color: { color: '#16a34a' }, width: 2.5, opacity: 1, dashes: false, font: { color: '#4b5563'} },
+                default: { color: { color: '#d1d5db' }, dashes: true, opacity: 0.5, width: 1, font: { color: '#9ca3af'} },
+                muted: { opacity: 0.2, color: { color: '#e5e7eb'}, dashes: true, width: 1, font: {color: '#d1d5db'} },
+                selected: { width: 3, color: { color: '#2563eb' }, opacity: 1, dashes: false, font: { color: '#1e3a8a'} }
+            }
+        };
+
+        function getEdgeStyle(styleName) {
+            const specificStyle = styles.edges[styleName] || {};
+            return {
+                ...specificStyle,
+                font: {...styles.edges.baseFont, ...(specificStyle.font || {}) }
+            };
+        }
+
+        function applyStyles() {
+            const nodeUpdates = [];
+            const edgeUpdates = [];
+            const activeNodes = activePathData.nodes || new Set();
+            const activeEdges = activePathData.edges || new Set();
+
+            nodesDataSet.forEach(node => {
+                let style = styles.nodes.muted;
+                const nodeData = nodesDataSet.get(node.id);
+
+                if (activeNodes.has(node.id)) {
+                    style = styles.nodes.pathActive;
+                } else if (nodeData?.group === 'context') {
+                    style = styles.nodes.default;
+                }
+                nodeUpdates.push({ id: node.id, ...style });
+            });
+
+            edgesDataSet.forEach(edge => {
+                let style = getEdgeStyle('muted');
+                const edgeData = edgesDataSet.get(edge.id);
+
+                if (activeEdges.has(edge.id)) {
+                    style = getEdgeStyle('pathActive');
+                } else if (edgeData?.group === 'context') {
+                    style = getEdgeStyle('default');
+                }
+
+                edgesDataSet.update({ 
+                    id: edge.id, 
+                    ...style,
+                    label: edgeData?.label || '',
+                    from: edgeData.from,
+                    to: edgeData.to,
+                    attribution_key: edgeData?.attribution_key,
+                    group: edgeData?.group
+                });
+            });
+
+            if (nodeUpdates.length > 0) nodesDataSet.update(nodeUpdates);
+        }
+
+        function renderKG(pkg) {
+            currentAttributions = pkg.attributions || {};
+            const kgData = pkg.kg_explanation;
+
+            activePathData = {
+                nodes: new Set(kgData.path?.nodeIds.map(String) || []),
+                edges: new Set(kgData.path?.edgeIds || [])
+            };
+
+            hideAttribution();
+
+            if (network) {
+                network.destroy();
+                network = null;
+            }
+            nodesDataSet.clear();
+            edgesDataSet.clear();
+            currentlySelectedEdgeId = null;
+
+            if (!kgData?.nodes || !kgData?.edges) {
+                kgContainer.innerHTML = '<p class="text-xs text-gray-500 p-2">No KG explanation available.</p>';
+                return;
+            }
+
+            nodesDataSet.add(kgData.nodes.map(n => ({...n, id: String(n.id)})));
+            edgesDataSet.add(kgData.edges.map(e => ({...e, from: String(e.from), to: String(e.to), label: e.label || ''})));
+
+            const options = {
+                 layout: { hierarchical: { enabled: true, levelSeparation: 180, nodeSpacing: 120, treeSpacing: 200, direction: 'LR', sortMethod: 'directed', shakeTowards: 'roots' } },
+                 interaction: { dragNodes: true, selectConnectedEdges: false, hover: false },
+                 physics: { enabled: false },
+                 nodes: { 
+                    shape: 'circle',
+                    margin: { top: 10, right: 10, bottom: 10, left: 10 },
+                    font: { size: 11 } 
+                 },
+                 edges: {
+                     font: styles.edges.baseFont,
+                     arrows: 'to',
+                     smooth: { type: 'cubicBezier', forceDirection: 'horizontal', roundness: 0.4 },
+                     selectionWidth: 0,
+                     hoverWidth: 0
+                 }
+            };
+
+            network = new vis.Network(kgContainer, { nodes: nodesDataSet, edges: edgesDataSet }, options);
+            applyStyles();
+
+            network.on("click", handleNetworkClick);
+            network.on("doubleClick", handleNetworkDoubleClick);
+        }
+
+        function handleNetworkClick(params) {
+            const clickedEdgeIds = params.edges;
+            
+            if (currentlySelectedEdgeId && currentlySelectedEdgeId !== (clickedEdgeIds[0] || null)) {
+                resetEdgeStyle(currentlySelectedEdgeId);
+                currentlySelectedEdgeId = null;
+            }
+
+            if (clickedEdgeIds.length > 0) {
+                const edgeId = clickedEdgeIds[0];
+                const edgeData = edgesDataSet.get(edgeId);
+                
+                if (edgeData && edgeData.opacity > 0.3) {
+                    displayAttribution(edgeData);
+                    selectEdge(edgeId);
+                } else {
+                    hideAttribution();
+                }
+            } else {
+                if (currentlySelectedEdgeId) {
+                    resetEdgeStyle(currentlySelectedEdgeId);
+                    currentlySelectedEdgeId = null;
+                }
+                hideAttribution();
+            }
+        }
+
+        function handleNetworkDoubleClick(params) {
+            if (params.edges.length > 0) {
+                const edgeId = params.edges[0];
+                const edgeData = edgesDataSet.get(edgeId);
+                
+                if (!edgeData || edgeData.opacity < 0.4) return;
+
+                const newLabel = prompt(`Rename relationship "${edgeData.label || ''}":`, edgeData.label || '');
+                if (newLabel !== null && newLabel !== edgeData.label) {
+                    edgesDataSet.update({ id: edgeId, label: newLabel });
+                }
+            }
+        }
+
+        function resetEdgeStyle(edgeId) {
+            const edgeData = edgesDataSet.get(edgeId);
+            if (!edgeData) return;
+
+            let resetStyle = getEdgeStyle('muted');
+            if (edgeData.group === 'context') {
+                resetStyle = getEdgeStyle('default');
+            } else if (activePathData.edges.has(edgeId)) {
+                resetStyle = getEdgeStyle('pathActive');
+            }
+            
+            edgesDataSet.update({
+                id: edgeId,
+                ...resetStyle,
+                label: edgeData.label || '',
+                from: edgeData.from,
+                to: edgeData.to,
+                attribution_key: edgeData.attribution_key,
+                group: edgeData.group
+            });
+            network.unselectAll();
+        }
+
+        function selectEdge(edgeId) {
+            if (currentlySelectedEdgeId !== edgeId) {
+                const edgeData = edgesDataSet.get(edgeId);
+                edgesDataSet.update({
+                    id: edgeId,
+                    ...getEdgeStyle('selected'),
+                    label: edgeData.label || '',
+                    from: edgeData.from,
+                    to: edgeData.to,
+                    attribution_key: edgeData.attribution_key,
+                    group: edgeData.group
+                });
+                currentlySelectedEdgeId = edgeId;
+                network.selectEdges([edgeId]);
+            }
+        }
+
+        function displayAttribution(edgeData) {
+            const fromNode = nodesDataSet.get(edgeData.from);
+            const toNode = nodesDataSet.get(edgeData.to);
+            
+            if (fromNode && toNode) {
+                const fromLabel = fromNode.label.replace(/\n/g, ' ').trim();
+                const toLabel = toNode.label.replace(/\n/g, ' ').trim();
+                const edgeLabel = edgeData.label || '';
+                attributionTitleEl.innerHTML = `Source attribution for <span class="font-mono text-xs">${fromLabel} --[${edgeLabel}]--> ${toLabel}</span>`;
+            }
+
+            if (edgeData.attribution_key && currentAttributions[edgeData.attribution_key]) {
+                const attrData = currentAttributions[edgeData.attribution_key];
+                attributionTextDisplayEl.innerHTML = attrData.snippet + 
+                    ` <a href="#" onclick="event.preventDefault(); showModal('${edgeData.attribution_key}')" class="font-semibold">Read More...</a>`;
+            } else {
+                attributionTextDisplayEl.innerHTML = 'No specific attribution found for this relation.';
+            }
+            attributionDisplayEl.classList.remove('hidden');
+        }
+
+        function hideAttribution() {
+            attributionTextDisplayEl.innerHTML = 'Click on a highlighted relation (arrow) to see its source attribution.';
+            attributionDisplayEl.classList.add('hidden');
+            attributionTitleEl.innerHTML = 'Source Attribution for Selected Relation (<span class="font-mono text-xs">N/A</span>):';
+        }
+
+        function showModal(key) {
+            if (currentAttributions[key]?.detail) {
+                modalBodyEl.innerHTML = currentAttributions[key].detail;
+                modalEl.classList.remove('hidden');
+            }
+        }
+
+        function hideModal() {
+            modalEl.classList.add('hidden');
+            modalBodyEl.innerHTML = "<p>Loading...</p>";
+        }
+
+        function showFullKGModal() {
+            fullKGModalEl.classList.remove('hidden');
+            if (!fullNetwork) {
+                renderFullKG();
+            } else {
+                fullNetwork.setOptions({ physics: { enabled: true } });
+            }
+        }
+
+        function hideFullKGModal() {
+            fullKGModalEl.classList.add('hidden');
+            if (fullNetwork) {
+                fullNetwork.setOptions({ physics: { enabled: false } });
+            }
+        }
+
+        function renderFullKG() {
+            const data = {
+                nodes: new vis.DataSet(fullKnowledgeGraph.nodes),
+                edges: new vis.DataSet(fullKnowledgeGraph.edges)
+            };
+            
+            const options = {
+                layout: { randomSeed: 2 },
+                physics: {
+                    enabled: true,
+                    solver: 'barnesHut',
+                    barnesHut: {
+                        gravitationalConstant: -15000,
+                        centralGravity: 0.1,
+                        springLength: 120,
+                        springConstant: 0.05
+                    },
+                    stabilization: { iterations: 250 }
+                },
+                interaction: { dragNodes: true, dragView: true, zoomView: true, hover: true },
+                nodes: {
+                    shape: 'box',
+                    margin: 8,
+                    font: { size: 11, color: '#374151' },
+                    color: { background: '#e0e7ff', border: '#a5b4fc' },
+                    borderWidth: 1
+                },
+                edges: {
+                    arrows: 'to',
+                    width: 1.5,
+                    color: { color: '#9ca3af', hover: '#3b82f6', highlight: '#3b82f6' },
+                    font: { size: 9, color: '#6b7280', align: 'middle', strokeWidth: 0, background: 'rgba(255, 255, 255, 0.7)' },
+                    smooth: { type: 'continuous' }
+                }
+            };
+
+            fullKGContainerEl.innerHTML = '<p class="text-center text-gray-500 p-8">Loading full knowledge graph...</p>';
+
+            setTimeout(() => {
+                fullNetwork = new vis.Network(fullKGContainerEl, data, options);
+                fullNetwork.on("stabilizationIterationsDone", () => {
+                    fullNetwork.fit();
+                    fullNetwork.setOptions({ physics: { enabled: false } });
+                });
+            }, 100);
+        }
+
+        function createNavCircles() {
+            navCirclesContainerEl.innerHTML = '';
+            qaPackages.forEach((_, i) => {
+                const circle = document.createElement('button');
+                circle.textContent = i + 1;
+                circle.className = 'nav-circle';
+                circle.onclick = () => loadPackage(i);
+                navCirclesContainerEl.appendChild(circle);
+            });
+        }
+
+        function updateNavCircles(activeIndex) {
+            document.querySelectorAll('.nav-circle').forEach((circle, index) => {
+                circle.classList.toggle('active', index === activeIndex);
+            });
+        }
+
+        function loadPackage(index) {
+            if (index < 0 || index >= qaPackages.length) return;
+
+            currentPackageIndex = index;
+            const pkg = qaPackages[index];
+            
+            questionTextEl.innerHTML = pkg.question;
+            answerTextEl.innerHTML = pkg.answer;
+            renderKG(pkg);
+            updateNavCircles(index);
+        }
+
+        function recordValidation(validation) {
+            if (currentPackageIndex >= qaPackages.length) return;
+            
+            const pkg = qaPackages[currentPackageIndex];
+            console.log("Validation Recorded:", {
+                question_id: pkg.id,
+                validation: validation,
+                question_index: currentPackageIndex
+            });
+
+            saveMessageEl.textContent = `Validation ('${validation}') saved for Q${currentPackageIndex + 1}.`;
+            setTimeout(() => {
+                if (saveMessageEl.textContent.includes(validation)) {
+                    saveMessageEl.textContent = '';
+                }
+            }, 2500);
+        }
+
+        // Initialize
+        if (questionTextEl && answerTextEl && kgContainer) {
+            hideAttribution();
+            createNavCircles();
+            loadPackage(0);
+
+            modalEl?.addEventListener('click', (e) => {
+                if (e.target === modalEl) hideModal();
+            });
+
+            fullKGModalEl?.addEventListener('click', (e) => {
+                if (e.target === fullKGModalEl) hideFullKGModal();
+            });
+        }
+    </script>
+</body>
+</html>
