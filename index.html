@@ -196,7 +196,7 @@
             </div>
         </div>
 
-        <div id="decisionSection" class="mt-8 pt-6 border-t border-gray-200 text-center">
+        <div id="decisionSection" class="mt-6 pt-6 border-t border-gray-200 text-center">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">Validate Answer</h3>
             <p class="text-sm text-gray-600 mb-5">Review the proposed answer and its reasoning path. Is this answer correct? Click relations (arrows) for evidence.</p>
             <div class="flex flex-wrap justify-center gap-2">
@@ -204,6 +204,51 @@
                  <button onclick="recordValidation('incorrect')" class="min-w-[120px] bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-150 ease-in-out text-sm">Incorrect</button>
             </div>
             <div id="saveMessage" class="h-6 mt-2 text-sm text-green-700 font-medium"></div>
+
+            <!-- Feedback Section -->
+            <div class="mt-6 pt-6 border-t border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Feedback</h3>
+                <p class="text-sm text-gray-600 mb-5">Help us improve our dataset generation pipeline by providing optional feedback!</p>
+                <textarea 
+                    id="feedbackText" 
+                    rows="4" 
+                    class="w-full max-w-2xl mx-auto px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm resize-vertical"
+                    placeholder="Share your thoughts on the question quality, answer accuracy, or reasoning clarity..."
+                ></textarea>
+
+                <!-- Submit Button -->
+                <div class="mt-4">
+                    <button 
+                        onclick="submitFeedback()" 
+                        class="min-w-[140px] bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-150 ease-in-out text-sm"
+                    >
+                        Submit Feedback
+                    </button>
+                </div>
+
+                <!-- Feedback Message -->
+                <div id="feedbackMessage" class="h-6 mt-2 text-sm text-green-700 font-medium"></div>
+
+                <!-- Navigation Buttons -->
+                <div class="flex justify-center gap-3 mt-6">
+                    <button 
+                        id="prevButton" 
+                        onclick="navigatePrevious()" 
+                        class="nav-circle disabled:opacity-30 disabled:cursor-not-allowed"
+                        title="Previous question"
+                    >
+                        ←
+                    </button>
+                    <button 
+                        id="nextButton" 
+                        onclick="navigateNext()" 
+                        class="nav-circle disabled:opacity-30 disabled:cursor-not-allowed"
+                        title="Next question"
+                    >
+                        →
+                    </button>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -832,6 +877,7 @@
         const attributionTextDisplayEl = document.getElementById('attributionTextDisplay');
         const attributionTitleEl = document.getElementById('attributionTitle');
         const saveMessageEl = document.getElementById('saveMessage');
+        const feedbackMessageEl = document.getElementById('feedbackMessage');
         const navCirclesContainerEl = document.getElementById('navigationSection');
         const modalEl = document.getElementById('detailModal');
         const modalBodyEl = document.getElementById('modalBody');
@@ -1138,6 +1184,37 @@
             }, 100);
         }
 
+        function submitFeedback() {
+            if (currentPackageIndex >= qaPackages.length) return;
+            
+            const pkg = qaPackages[currentPackageIndex];
+            const feedbackText = document.getElementById('feedbackText').value;
+            
+            // Only submit if there's actual feedback
+            if (!feedbackText.trim()) {
+                feedbackMessageEl.textContent = 'Please enter feedback before submitting.';
+                feedbackMessageEl.style.color = '#dc2626'; // red color
+                setTimeout(() => {
+                    feedbackMessageEl.textContent = '';
+                    feedbackMessageEl.style.color = '#15803d'; // reset to green
+                }, 2500);
+                return;
+            }
+            
+            console.log("Feedback Submitted:", {
+                question_id: pkg.id,
+                question_index: currentPackageIndex,
+                feedback: feedbackText
+            });
+
+            feedbackMessageEl.textContent = `Feedback saved for Q${currentPackageIndex + 1}. Thank you!`;
+            feedbackMessageEl.style.color = '#15803d'; // green color
+            setTimeout(() => {
+                feedbackMessageEl.textContent = '';
+                document.getElementById('feedbackText').value = ''; // Clear feedback
+            }, 2500);
+        }
+
         function createNavCircles() {
             navCirclesContainerEl.innerHTML = '';
             qaPackages.forEach((_, i) => {
@@ -1153,6 +1230,27 @@
             document.querySelectorAll('.nav-circle').forEach((circle, index) => {
                 circle.classList.toggle('active', index === activeIndex);
             });
+            
+            // Update navigation buttons
+            const prevButton = document.getElementById('prevButton');
+            const nextButton = document.getElementById('nextButton');
+            
+            if (prevButton && nextButton) {
+                prevButton.disabled = activeIndex === 0;
+                nextButton.disabled = activeIndex === qaPackages.length - 1;
+            }
+        }
+
+        function navigatePrevious() {
+            if (currentPackageIndex > 0) {
+                loadPackage(currentPackageIndex - 1);
+            }
+        }
+
+        function navigateNext() {
+            if (currentPackageIndex < qaPackages.length - 1) {
+                loadPackage(currentPackageIndex + 1);
+            }
         }
 
         function loadPackage(index) {
