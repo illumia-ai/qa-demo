@@ -306,11 +306,10 @@
                         { id: 'n4', label: 'retinopathy' },
                         { id: 'n5', label: 'hypertension' },
                         { id: 'n6', label: 'chronic\nrenal disease' },
-                        // Context nodes from Full KG - adjacent to main path
-                        { id: 'n7', label: 'obesity', group: 'context' },
-                        { id: 'n8', label: 'stroke', group: 'context' },
-                        { id: 'n9', label: 'fasting blood\nglucose (fbg)', group: 'context' },
-                        { id: 'n10', label: 'podocyte\ninjury', group: 'context' }
+                        // Context nodes - adjacent to main path from Full KG
+                        { id: 'n7', label: 'fasting blood\nglucose (fbg)', group: 'context' },
+                        { id: 'n8', label: 'podocyte\ninjury', group: 'context' },
+                        { id: 'n9', label: 'obesity', group: 'context' }
                     ],
                     edges: [
                         { from: 'n1', to: 'n2', id: 'e1_2', label: 'due_to', attribution_key: 'nh_gdm' },
@@ -318,11 +317,10 @@
                         { from: 'n3', to: 'n4', id: 'e3_4', label: 'cause_of', attribution_key: 'dm_retinopathy' },
                         { from: 'n4', to: 'n5', id: 'e4_5', label: 'associated_with', attribution_key: 'retinopathy_htn' },
                         { from: 'n5', to: 'n6', id: 'e5_6', label: 'associated_with', attribution_key: 'htn_crd' },
-                        // Context edges from Full KG
-                        { from: 'n7', to: 'n5', id: 'e7_5', label: 'due_to', group: 'context', attribution_key: 'htn_obesity' },
-                        { from: 'n8', to: 'n5', id: 'e8_5', label: 'associated_with', group: 'context', attribution_key: 'stroke_htn' },
-                        { from: 'n9', to: 'n3', id: 'e9_3', label: 'associated_with', group: 'context', attribution_key: 'fbg_dm' },
-                        { from: 'n10', to: 'n3', id: 'e10_3', label: 'due_to', group: 'context', attribution_key: 'podo_dm' }
+                        // Context edges - adjacent connections from Full KG
+                        { from: 'n7', to: 'n3', id: 'e7_3', label: 'associated_with', group: 'context', attribution_key: 'fbg_dm' },
+                        { from: 'n8', to: 'n3', id: 'e8_3', label: 'due_to', group: 'context', attribution_key: 'podo_dm' },
+                        { from: 'n5', to: 'n9', id: 'e5_9', label: 'due_to', group: 'context', attribution_key: 'htn_obesity' }
                     ],
                     path: {
                         nodeIds: ['n1', 'n2', 'n3', 'n4', 'n5', 'n6'],
@@ -359,14 +357,6 @@
                         detail: "<h4>hypertension --[associated_with]--> chronic renal disease</h4>" +
                                 "<p>...the findings of this study unveiled a substantial correlation between elevated rc, diminished egfr levels, and the risk of developing hypertension...</p><p><i>(Source: <a href='https://pmc.ncbi.nlm.nih.gov/articles/PMC11864924/' target='_blank'>https://pmc.ncbi.nlm.nih.gov/articles/PMC11864924/</a>)</i></p>"
                     },
-                    'htn_obesity': {
-                        snippet: "...<span class='highlight'>obesity is a major cause of hypertension</span>...",
-                        detail: "<h4>hypertension --[due_to]--> obesity</h4><p>...obesity is a major cause of hypertension, and both are major risk factors for cardiovascular disease...</p><p><i>(Source: <a href='https://pmc.ncbi.nlm.nih.gov/articles/PMC8799839/' target='_blank'>https://pmc.ncbi.nlm.nih.gov/articles/PMC8799839/</a>)</i></p>"
-                    },
-                    'stroke_htn': {
-                        snippet: "...<span class='highlight'>stroke is highly associated with hypertension</span>...",
-                        detail: "<h4>stroke --[associated_with]--> hypertension</h4><p>...in a multivariate cox proportional hazards regression model, the combination of elevated tyg - bmi levels and hypertension, treated as routine variables, was still significantly associated with the risk of stroke...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/39525457/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/39525457/</a>)</i></p>"
-                    },
                     'fbg_dm': {
                         snippet: "...<span class='highlight'>fasting blood glucose is associated with diabetes mellitus</span>...",
                         detail: "<h4>fasting blood glucose (fbg) --[associated_with]--> diabetes mellitus</h4><p>...in this study, we examined the relationship between fasting blood glucose ( fbg ) and 28 - day mortality in coronavirus disease 2019 ( covid - 19 ) patients not previously diagnosed as having diabetes...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/32647915/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/32647915/</a>)</i></p>"
@@ -374,6 +364,10 @@
                     'podo_dm': {
                         snippet: "...<span class='highlight'>podocyte injury is due to diabetes mellitus</span>...",
                         detail: "<h4>podocyte injury --[due_to]--> diabetes mellitus</h4><p>...in diabetic mice, tnfaip2 deletion exacerbated albuminuria, renal function loss, podocyte injury, and mesangial expansion.</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/35659195/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/35659195/</a>)</i></p>"
+                    },
+                    'htn_obesity': {
+                        snippet: "...<span class='highlight'>obesity is a major cause of hypertension</span>...",
+                        detail: "<h4>hypertension --[due_to]--> obesity</h4><p>...obesity is a major cause of hypertension, and both are major risk factors for cardiovascular disease...</p><p><i>(Source: <a href='https://pmc.ncbi.nlm.nih.gov/articles/PMC8799839/' target='_blank'>https://pmc.ncbi.nlm.nih.gov/articles/PMC8799839/</a>)</i></p>"
                     }
                 }
             },
@@ -390,11 +384,10 @@
                         { id: 'n4', label: 'diabetic\nnephropathy' },
                         { id: 'n5', label: 'dn' },
                         { id: 'n6', label: 'macroalbuminuria' },
-                        // Context nodes from Full KG - adjacent to main path
+                        // Context nodes - adjacent to main path from Full KG
                         { id: 'n7', label: 'diabetes\nmellitus', group: 'context' },
                         { id: 'n8', label: 'diabetic\ncardiomyopathy', group: 'context' },
-                        { id: 'n9', label: 'ferroptosis', group: 'context' },
-                        { id: 'n10', label: 'ckd\nprogression', group: 'context' }
+                        { id: 'n9', label: 'ferroptosis', group: 'context' }
                     ],
                     edges: [
                         { from: 'n1', to: 'n2', id: 'e1_2', label: 'associated_with', attribution_key: 'insulin_hyper' },
@@ -402,11 +395,10 @@
                         { from: 'n3', to: 'n4', id: 'e3_4', label: 'due_to', attribution_key: 'podo_dn' },
                         { from: 'n4', to: 'n5', id: 'e4_5', label: 'same_as', attribution_key: 'dn_dn' },
                         { from: 'n5', to: 'n6', id: 'e5_6', label: 'associated_with', attribution_key: 'dn_macro' },
-                        // Context edges from Full KG
+                        // Context edges - adjacent connections from Full KG
                         { from: 'n3', to: 'n7', id: 'e3_7', label: 'due_to', group: 'context', attribution_key: 'podo_dm' },
                         { from: 'n2', to: 'n8', id: 'e2_8', label: 'cause_of', group: 'context', attribution_key: 'hyper_dcm' },
-                        { from: 'n9', to: 'n3', id: 'e9_3', label: 'associated_with', group: 'context', attribution_key: 'ferro_podo' },
-                        { from: 'n10', to: 'n4', id: 'e10_4', label: 'due_to', group: 'context', attribution_key: 'ckd_dn' }
+                        { from: 'n9', to: 'n3', id: 'e9_3', label: 'associated_with', group: 'context', attribution_key: 'ferro_podo' }
                     ],
                     path: {
                         nodeIds: ['n1', 'n2', 'n3', 'n4', 'n5', 'n6'],
@@ -454,10 +446,6 @@
                     'ferro_podo': {
                         snippet: "...<span class='highlight'>ferroptosis is associated with podocyte injury</span>...",
                         detail: "<h4>ferroptosis --[associated_with]--> podocyte injury</h4><p>...the injury and death of glomerular podocytes are the keys to dkd. currently, a variety of cell death modes have been identified in podocytes, including apoptosis, autophagy... ferroptosis...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/35149303/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/35149303/</a>)</i></p>"
-                    },
-                    'ckd_dn': {
-                        snippet: "...<span class='highlight'>ckd progression is due to diabetic nephropathy</span>...",
-                        detail: "<h4>ckd progression --[due_to]--> diabetic nephropathy</h4><p>...Type 2 diabetic participants with risk factors such as, hyperlipidemia, hypertension, dm duration ≥15 years and diabetic retinopathy showed a high / very high risk of ckd progression...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/36568108/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/36568108/</a>)</i></p>"
                     }
                 }
             },
@@ -474,7 +462,7 @@
                         { id: 'n4', label: 'hyperglycemia' },
                         { id: 'n5', label: 'diabetic\ncardiomyopathy' },
                         { id: 'n6', label: 'cardiac remodeling' },
-                        // Context nodes from Full KG - adjacent to main path
+                        // Context nodes - adjacent to main path from Full KG
                         { id: 'n7', label: 'diabetes\nmellitus', group: 'context' },
                         { id: 'n8', label: 'diabetic\nnephropathy', group: 'context' },
                         { id: 'n9', label: 'missed basal\ninsulin doses', group: 'context' }
@@ -485,7 +473,7 @@
                         { from: 'n3', to: 'n4', id: 'e3_4', label: 'due_to', attribution_key: 'podo_hyper' },
                         { from: 'n4', to: 'n5', id: 'e4_5', label: 'cause_of', attribution_key: 'hyper_dcm' },
                         { from: 'n5', to: 'n6', id: 'e5_6', label: 'has_associated_morphology', attribution_key: 'dcm_remodel' },
-                        // Context edges from Full KG
+                        // Context edges - adjacent connections from Full KG
                         { from: 'n3', to: 'n7', id: 'e3_7', label: 'due_to', group: 'context', attribution_key: 'podo_dm' },
                         { from: 'n3', to: 'n8', id: 'e3_8', label: 'due_to', group: 'context', attribution_key: 'podo_dn' },
                         { from: 'n9', to: 'n4', id: 'e9_4', label: 'associated_with', group: 'context', attribution_key: 'insulin_hyper' }
@@ -555,14 +543,11 @@
                         { id: 'n4', label: 'hypertension' },
                         { id: 'n5', label: 'obesity' },
                         { id: 'n6', label: 'adipose\ninflammation' },
-                        // Context nodes from Full KG - adjacent to main path
+                        // Context nodes - adjacent to main path from Full KG
                         { id: 'n7', label: 'gestational\ndiabetes mellitus', group: 'context' },
                         { id: 'n8', label: 'podocyte\ninjury', group: 'context' },
-                        { id: 'n9', label: 'postoperative\nwound infection', group: 'context' },
-                        { id: 'n10', label: 'chronic\nrenal disease', group: 'context' },
-                        { id: 'n11', label: 'stroke', group: 'context' },
-                        { id: 'n12', label: 'metabolic\nsyndrome', group: 'context' },
-                        { id: 'n13', label: 'asthma', group: 'context' }
+                        { id: 'n9', label: 'chronic\nrenal disease', group: 'context' },
+                        { id: 'n10', label: 'metabolic\nsyndrome', group: 'context' }
                     ],
                     edges: [
                         { from: 'n1', to: 'n2', id: 'e1_2', label: 'associated_with', attribution_key: 'fbg_dm' },
@@ -570,14 +555,11 @@
                         { from: 'n3', to: 'n4', id: 'e3_4', label: 'associated_with', attribution_key: 'retinopathy_htn' },
                         { from: 'n4', to: 'n5', id: 'e4_5', label: 'due_to', attribution_key: 'htn_obesity' },
                         { from: 'n5', to: 'n6', id: 'e5_6', label: 'associated_with', attribution_key: 'obesity_adipose' },
-                        // Context edges from Full KG
+                        // Context edges - adjacent connections from Full KG
                         { from: 'n7', to: 'n2', id: 'e7_2', label: 'isa', group: 'context', attribution_key: 'gdm_dm' },
                         { from: 'n8', to: 'n2', id: 'e8_2', label: 'due_to', group: 'context', attribution_key: 'podo_dm' },
-                        { from: 'n2', to: 'n9', id: 'e2_9', label: 'associated_with', group: 'context', attribution_key: 'dm_wound' },
-                        { from: 'n4', to: 'n10', id: 'e4_10', label: 'associated_with', group: 'context', attribution_key: 'htn_crd' },
-                        { from: 'n11', to: 'n4', id: 'e11_4', label: 'associated_with', group: 'context', attribution_key: 'stroke_htn' },
-                        { from: 'n12', to: 'n5', id: 'e12_5', label: 'has_part', group: 'context', attribution_key: 'ms_obesity' },
-                        { from: 'n5', to: 'n13', id: 'e5_13', label: 'cause_of', group: 'context', attribution_key: 'obesity_asthma' }
+                        { from: 'n4', to: 'n9', id: 'e4_9', label: 'associated_with', group: 'context', attribution_key: 'htn_crd' },
+                        { from: 'n10', to: 'n5', id: 'e10_5', label: 'has_part', group: 'context', attribution_key: 'ms_obesity' }
                     ],
                     path: {
                         nodeIds: ['n1', 'n2', 'n3', 'n4', 'n5', 'n6'],
@@ -625,30 +607,15 @@
                         snippet: "...<span class='highlight'>podocyte injury is due to diabetes mellitus</span>...",
                         detail: "<h4>podocyte injury --[due_to]--> diabetes mellitus</h4><p>...in diabetic mice, tnfaip2 deletion exacerbated albuminuria, renal function loss, podocyte injury, and mesangial expansion.</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/35659195/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/35659195/</a>)</i></p>"
                     },
-                    'dm_wound': {
-                        snippet: "...<span class='highlight'>multivariate analysis further confirmed these findings, highlighting prolonged operation time and diabetes as significant predictors of pwis</span>...",
-                        detail: "<h4>diabetes mellitus --[associated_with]--> postoperative wound infection</h4>" +
-                                "<p>...multivariate analysis further confirmed these findings, highlighting prolonged operation time and diabetes as significant predictors of pwis, and antibiotic use as a protective factor.</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/38531534/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/38531534/</a>)</i></p>"
-                    },
                     'htn_crd': {
                         snippet: "...<span class='highlight'>the findings of this study unveiled a substantial correlation between elevated rc, diminished egfr levels, and the risk of developing hypertension</span>...",
                         detail: "<h4>hypertension --[associated_with]--> chronic renal disease</h4>" +
                                 "<p>...the findings of this study unveiled a substantial correlation between elevated rc, diminished egfr levels, and the risk of developing hypertension...</p><p><i>(Source: <a href='https://pmc.ncbi.nlm.nih.gov/articles/PMC11864924/' target='_blank'>https://pmc.ncbi.nlm.nih.gov/articles/PMC11864924/</a>)</i></p>"
                     },
-                    'stroke_htn': {
-                        snippet: "...<span class='highlight'>stroke is highly associated with hypertension</span>...",
-                        detail: "<h4>stroke --[associated_with]--> hypertension</h4><p>...in a multivariate cox proportional hazards regression model, the combination of elevated tyg - bmi levels and hypertension, treated as routine variables, was still significantly associated with the risk of stroke...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/39525457/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/39525457/</a>)</i></p>"
-                    },
                     'ms_obesity': {
                         snippet: "...<span class='highlight'>when we divide the metabolic syndrome by its components, high pro - inflammatory diet and hyperglycaemia, tag, hypertension and abdominal obesity... obese people are at increased risk of metabolic syndrome</span>...",
                         detail: "<h4>metabolic syndrome --[has_part]--> obesity</h4>" +
                                 "<p>...when we divide the metabolic syndrome by its components, high pro - inflammatory diet and hyperglycaemia, tag, hypertension and abdominal obesity... obese people are at increased risk of metabolic syndrome...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/34658314/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/34658314/</a>)</i></p>"
-                    },
-                    'obesity_asthma': {
-                        snippet: "...<span class='highlight'>obesity negatively impacts asthma outcomes and has a causal link in the pathogenesis of adult - onset asthma</span>... <span class='highlight'>obesity increases the morbidity and severity of asthma, with poor sensitivity to corticosteroid treatment</span>...",
-                        detail: "<h4>obesity --[cause_of]--> asthma</h4>" +
-                                "<p>...obesity negatively impacts asthma outcomes and has a causal link in the pathogenesis of adult - onset asthma.</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/34921631/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/34921631/</a>)</i></p>" +
-                                "<p>...obesity increases the morbidity and severity of asthma, with poor sensitivity to corticosteroid treatment.</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/33421348/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/33421348/</a>)</i></p>"
                     }
                 }
             },
@@ -665,10 +632,8 @@
                         { id: 'n4', label: 'fatty\nliver' },
                         { id: 'n5', label: 'metabolic\nsyndrome' },
                         { id: 'n6', label: 'cardiovascular\ndiseases' },
-                        // Context nodes from Full KG - adjacent to main path
-                        { id: 'n7', label: 'hepatic\nfibrosis', group: 'context' },
-                        { id: 'n8', label: 'obesity', group: 'context' },
-                        { id: 'n9', label: 'mets', group: 'context' }
+                        // Context nodes - adjacent to main path from Full KG
+                        { id: 'n7', label: 'obesity', group: 'context' }
                     ],
                     edges: [
                         { from: 'n1', to: 'n2', id: 'e1_2', label: 'associated_with', attribution_key: 'hcc_cirrhosis' },
@@ -676,10 +641,8 @@
                         { from: 'n3', to: 'n4', id: 'e3_4', label: 'characterized_by', attribution_key: 'nafld_fatty' },
                         { from: 'n4', to: 'n5', id: 'e4_5', label: 'associated_with', attribution_key: 'fatty_ms' },
                         { from: 'n5', to: 'n6', id: 'e5_6', label: 'cause_of', attribution_key: 'ms_cvd' },
-                        // Context edges from Full KG
-                        { from: 'n7', to: 'n3', id: 'e7_3', label: 'associated_with', group: 'context', attribution_key: 'fibrosis_nafld' },
-                        { from: 'n5', to: 'n8', id: 'e5_8', label: 'has_part', group: 'context', attribution_key: 'ms_obesity' },
-                        { from: 'n5', to: 'n9', id: 'e5_9', label: 'same_as', group: 'context', attribution_key: 'ms_mets' }
+                        // Context edges - adjacent connections from Full KG
+                        { from: 'n5', to: 'n7', id: 'e5_7', label: 'has_part', group: 'context', attribution_key: 'ms_obesity' }
                     ],
                     path: {
                         nodeIds: ['n1', 'n2', 'n3', 'n4', 'n5', 'n6'],
@@ -715,22 +678,10 @@
                                 "<p>...the risk of cardiovascular diseases is heightened by the presence of a risk factor cluster of metabolic syndrome...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/37569362/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/37569362/</a>)</i></p>" +
                                 "<p>...it increases the risk of cardiovascular disorder and stroke by three to ten times...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/39213318/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/39213318/</a>)</i></p>"
                     },
-                    'fibrosis_nafld': {
-                        snippet: "...<span class='highlight'>confirmed a positive correlation between the degree of hepatic fibrosis and the sdldl / ldl ratio</span>... <span class='highlight'>muscle mass adjusted for body weight was associated with nafld... and hepatic fibrosis</span>...",
-                        detail: "<h4>hepatic fibrosis --[associated_with]--> nafld</h4>" +
-                                "<p>...confirmed a positive correlation between the degree of hepatic fibrosis and the sdldl / ldl ratio...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/36123875/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/36123875/</a>)</i></p>" +
-                                "<p>...muscle mass adjusted for body weight was associated with nafld... and hepatic fibrosis...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/34875824/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/34875824/</a>)</i></p>"
-                    },
                     'ms_obesity': {
                         snippet: "...<span class='highlight'>when we divide the metabolic syndrome by its components, high pro - inflammatory diet and hyperglycaemia, tag, hypertension and abdominal obesity... obese people are at increased risk of metabolic syndrome</span>...",
                         detail: "<h4>metabolic syndrome --[has_part]--> obesity</h4>" +
                                 "<p>...when we divide the metabolic syndrome by its components, high pro - inflammatory diet and hyperglycaemia, tag, hypertension and abdominal obesity... obese people are at increased risk of metabolic syndrome...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/34658314/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/34658314/</a>)</i></p>"
-                    },
-                    'ms_mets': {
-                        snippet: "...<span class='highlight'>conclusions in the present long - term follow - up study, the presence of mets, but not obesity only, implies a greater risk of mortality and cvd</span>... <span class='highlight'>metabolic syndrome ( mets ) is a cluster of several disorders, such as hypertension, central obesity, dyslipidemia, hyperglycemia, insulin resistance and non - alcoholic fatty liver disease</span>...",
-                        detail: "<h4>metabolic syndrome --[same_as]--> mets</h4>" +
-                                "<p>...conclusions in the present long - term follow - up study, the presence of mets, but not obesity only, implies a greater risk of mortality and cvd...</p><p><i>(Source: <a href='https://pubmed.ncbi.nlm.nih.gov/35594302/' target='_blank'>https://pubmed.ncbi.nlm.nih.gov/35594302/</a>)</i></p>" +
-                                "<p>...metabolic syndrome ( mets ) is a cluster of several disorders, such as hypertension, central obesity, dyslipidemia, hyperglycemia, insulin resistance and non - alcoholic fatty liver disease...</p><p><i>(Source: <a href='https://pmc.ncbi.nlm.nih.gov/articles/PMC8267891/' target='_blank'>https://pmc.ncbi.nlm.nih.gov/articles/PMC8267891/</a>)</i></p>"
                     }
                 }
             }
@@ -738,7 +689,7 @@
 
         const fullKnowledgeGraph = {
             nodes: [
-                // Package 1 - all unique nodes
+                // Package 1 nodes
                 { id: 'full_n1', label: 'neonatal\nhypoglycaemia' },
                 { id: 'full_n2', label: 'gestational\ndiabetes mellitus' },
                 { id: 'full_n3', label: 'diabetes\nmellitus' },
@@ -746,7 +697,7 @@
                 { id: 'full_n5', label: 'hypertension' },
                 { id: 'full_n6', label: 'chronic\nrenal disease' },
                 
-                // Package 2 - all unique nodes
+                // Package 2 nodes
                 { id: 'full_n7', label: 'missed basal\ninsulin doses' },
                 { id: 'full_n8', label: 'hyperglycemia' },
                 { id: 'full_n9', label: 'podocyte\ninjury' },
@@ -754,110 +705,58 @@
                 { id: 'full_n11', label: 'dn' },
                 { id: 'full_n12', label: 'macroalbuminuria' },
                 
-                // Package 3 - all unique nodes
+                // Package 3 nodes
                 { id: 'full_n13', label: 'lipid\nperoxidation' },
                 { id: 'full_n14', label: 'ferroptosis' },
                 { id: 'full_n15', label: 'diabetic\ncardiomyopathy' },
                 { id: 'full_n16', label: 'cardiac remodeling' },
                 
-                // Package 4 - all unique nodes
+                // Package 4 nodes
                 { id: 'full_n17', label: 'fasting blood\nglucose (fbg)' },
                 { id: 'full_n18', label: 'obesity' },
                 { id: 'full_n19', label: 'adipose\ninflammation' },
                 
-                // Package 5 - all unique nodes
-                { id: 'full_n20', label: 'ckd\nprogression' },
-                { id: 'full_n21', label: 'postoperative\nwound infection' },
-                
-                // Package 6 - all unique nodes
-                { id: 'full_n22', label: 'hepatic\nfibrosis' },
-                { id: 'full_n23', label: 'nafld' },
-                { id: 'full_n24', label: 'fatty\nliver' },
-                { id: 'full_n25', label: 'metabolic\nsyndrome' },
-                { id: 'full_n26', label: 'asthma' },
-                
-                // Package 7 - all unique nodes
-                { id: 'full_n27', label: 'nafld - related\nhepatocellular\ncarcinoma' },
-                { id: 'full_n28', label: 'cirrhosis' },
-                { id: 'full_n29', label: 'cardiovascular\ndiseases' },
-                
-                // Package 8 - all unique nodes
-                { id: 'full_n30', label: 'diabetes -\nspecific qol' },
-                { id: 'full_n31', label: 'hypoglycemia' },
-                { id: 'full_n32', label: 'insulinoma' },
-                { id: 'full_n33', label: 'insulin' },
-                { id: 'full_n34', label: 'neuroprotective' },
-                
-                // Package 9 - all unique nodes
-                { id: 'full_n35', label: 'sarcopenic\nobesity' },
-                { id: 'full_n36', label: 'stroke' },
-                
-                // Package 10 - all unique nodes
-                { id: 'full_n37', label: 'metabolically\nunhealthy obese\n(muo)' },
-                { id: 'full_n38', label: 'mets' },
-                { id: 'full_n39', label: 'kidney\ndisease' }
+                // Package 5 nodes
+                { id: 'full_n20', label: 'nafld - related\nhepatocellular\ncarcinoma' },
+                { id: 'full_n21', label: 'cirrhosis' },
+                { id: 'full_n22', label: 'nafld' },
+                { id: 'full_n23', label: 'fatty\nliver' },
+                { id: 'full_n24', label: 'metabolic\nsyndrome' },
+                { id: 'full_n25', label: 'cardiovascular\ndiseases' }
             ],
             edges: [
-                // Package 1 edges (CSV: neonatal hypoglycaemia -> gestational diabetes mellitus -> diabetes mellitus -> retinopathy -> hypertension -> chronic renal disease)
+                // Package 1 edges (neonatal hypoglycaemia -> gestational diabetes mellitus -> diabetes mellitus -> retinopathy -> hypertension -> chronic renal disease)
                 { id: 'full_e1', from: 'full_n1', to: 'full_n2', label: 'due_to' },
                 { id: 'full_e2', from: 'full_n2', to: 'full_n3', label: 'isa' },
                 { id: 'full_e3', from: 'full_n3', to: 'full_n4', label: 'cause_of' },
                 { id: 'full_e4', from: 'full_n4', to: 'full_n5', label: 'associated_with' },
                 { id: 'full_e5', from: 'full_n5', to: 'full_n6', label: 'associated_with' },
                 
-                // Package 2 edges (CSV: missed basal insulin doses -> hyperglycemia -> podocyte injury -> diabetic nephropathy -> dn -> macroalbuminuria)
+                // Package 2 edges (missed basal insulin doses -> hyperglycemia -> podocyte injury -> diabetic nephropathy -> dn -> macroalbuminuria)
                 { id: 'full_e6', from: 'full_n7', to: 'full_n8', label: 'associated_with' },
                 { id: 'full_e7', from: 'full_n8', to: 'full_n9', label: 'cause_of' },
                 { id: 'full_e8', from: 'full_n9', to: 'full_n10', label: 'due_to' },
                 { id: 'full_e9', from: 'full_n10', to: 'full_n11', label: 'same_as' },
                 { id: 'full_e10', from: 'full_n11', to: 'full_n12', label: 'associated_with' },
                 
-                // Package 3 edges (CSV: lipid peroxidation -> ferroptosis -> podocyte injury -> hyperglycemia -> diabetic cardiomyopathy -> cardiac remodeling)
+                // Package 3 edges (lipid peroxidation -> ferroptosis -> podocyte injury -> hyperglycemia -> diabetic cardiomyopathy -> cardiac remodeling)
                 { id: 'full_e11', from: 'full_n13', to: 'full_n14', label: 'associated_with' },
                 { id: 'full_e12', from: 'full_n14', to: 'full_n9', label: 'associated_with' },
                 { id: 'full_e13', from: 'full_n9', to: 'full_n8', label: 'due_to' },
                 { id: 'full_e14', from: 'full_n8', to: 'full_n15', label: 'cause_of' },
                 { id: 'full_e15', from: 'full_n15', to: 'full_n16', label: 'has_associated_morphology' },
                 
-                // Package 4 edges (CSV: fbg -> diabetes mellitus -> retinopathy -> hypertension -> obesity -> adipose inflammation)
+                // Package 4 edges (fbg -> diabetes mellitus -> retinopathy -> hypertension -> obesity -> adipose inflammation)
                 { id: 'full_e16', from: 'full_n17', to: 'full_n3', label: 'associated_with' },
                 { id: 'full_e17', from: 'full_n5', to: 'full_n18', label: 'due_to' },
                 { id: 'full_e18', from: 'full_n18', to: 'full_n19', label: 'associated_with' },
                 
-                // Package 5 edges (CSV: ckd progression -> diabetic nephropathy -> dn -> podocyte injury -> diabetes mellitus -> postoperative wound infection)
-                { id: 'full_e19', from: 'full_n20', to: 'full_n10', label: 'due_to' },
-                { id: 'full_e20', from: 'full_n11', to: 'full_n9', label: 'has_associated_morphology' },
-                { id: 'full_e21', from: 'full_n9', to: 'full_n3', label: 'due_to' },
-                { id: 'full_e22', from: 'full_n3', to: 'full_n21', label: 'associated_with' },
-                
-                // Package 6 edges (CSV: hepatic fibrosis -> nafld -> fatty liver -> metabolic syndrome -> obesity -> asthma)
-                { id: 'full_e23', from: 'full_n22', to: 'full_n23', label: 'associated_with' },
-                { id: 'full_e24', from: 'full_n23', to: 'full_n24', label: 'characterized_by' },
-                { id: 'full_e25', from: 'full_n24', to: 'full_n25', label: 'associated_with' },
-                { id: 'full_e26', from: 'full_n25', to: 'full_n18', label: 'has_part' },
-                { id: 'full_e27', from: 'full_n18', to: 'full_n26', label: 'cause_of' },
-                
-                // Package 7 edges (CSV: nafld-related HCC -> cirrhosis -> nafld -> fatty liver -> metabolic syndrome -> cardiovascular diseases)
-                { id: 'full_e28', from: 'full_n27', to: 'full_n28', label: 'associated_with' },
-                { id: 'full_e29', from: 'full_n28', to: 'full_n23', label: 'has_causative_agent' },
-                { id: 'full_e30', from: 'full_n25', to: 'full_n29', label: 'cause_of' },
-                
-                // Package 8 edges (CSV: diabetes-specific qol -> hypoglycemia -> insulinoma -> insulin -> neuroprotective)
-                { id: 'full_e31', from: 'full_n30', to: 'full_n31', label: 'associated_with' },
-                { id: 'full_e32', from: 'full_n31', to: 'full_n32', label: 'due_to' },
-                { id: 'full_e33', from: 'full_n32', to: 'full_n33', label: 'associated_with' },
-                { id: 'full_e34', from: 'full_n33', to: 'full_n34', label: 'plays_role' },
-                
-                // Package 9 edges (CSV: sarcopenic obesity -> obesity -> stroke -> hypertension -> chronic renal disease)
-                { id: 'full_e35', from: 'full_n35', to: 'full_n18', label: 'isa' },
-                { id: 'full_e36', from: 'full_n18', to: 'full_n36', label: 'cause_of' },
-                { id: 'full_e37', from: 'full_n36', to: 'full_n5', label: 'associated_with' },
-                
-                // Package 10 edges (CSV: muo -> metabolic syndrome -> mets -> obesity -> kidney disease)
-                { id: 'full_e38', from: 'full_n37', to: 'full_n25', label: 'associated_with' },
-                { id: 'full_e39', from: 'full_n25', to: 'full_n38', label: 'same_as' },
-                { id: 'full_e40', from: 'full_n38', to: 'full_n18', label: 'associated_with' },
-                { id: 'full_e41', from: 'full_n18', to: 'full_n39', label: 'cause_of' }
+                // Package 5 edges (nafld-related HCC -> cirrhosis -> nafld -> fatty liver -> metabolic syndrome -> cardiovascular diseases)
+                { id: 'full_e19', from: 'full_n20', to: 'full_n21', label: 'associated_with' },
+                { id: 'full_e20', from: 'full_n21', to: 'full_n22', label: 'has_causative_agent' },
+                { id: 'full_e21', from: 'full_n22', to: 'full_n23', label: 'characterized_by' },
+                { id: 'full_e22', from: 'full_n23', to: 'full_n24', label: 'associated_with' },
+                { id: 'full_e23', from: 'full_n24', to: 'full_n25', label: 'cause_of' }
             ]
         };
 
@@ -973,25 +872,85 @@
                 return;
             }
 
-            nodesDataSet.add(kgData.nodes.map(n => ({...n, id: String(n.id)})));
+            const nodeById = {};
+            const pathNodeIds = kgData.path?.nodeIds?.map(String) || [];
+            const nodeLevelMap = {};
+            pathNodeIds.forEach((nodeId, index) => {
+                nodeLevelMap[nodeId] = index;
+            });
+
+            kgData.nodes.forEach(node => {
+                nodeById[String(node.id)] = node;
+            });
+
+            const contextLevelMap = {};
+            kgData.edges.forEach(edge => {
+                const fromId = String(edge.from);
+                const toId = String(edge.to);
+                const fromNode = nodeById[fromId];
+                const toNode = nodeById[toId];
+                const fromLevel = nodeLevelMap[fromId];
+                const toLevel = nodeLevelMap[toId];
+
+                if (fromNode?.group === 'context' && Number.isFinite(toLevel)) {
+                    const desiredLevel = toLevel - 1;
+                    contextLevelMap[fromId] = contextLevelMap[fromId] !== undefined 
+                        ? Math.min(contextLevelMap[fromId], desiredLevel)
+                        : desiredLevel;
+                }
+
+                if (toNode?.group === 'context' && Number.isFinite(fromLevel)) {
+                    const desiredLevel = fromLevel + 1;
+                    contextLevelMap[toId] = contextLevelMap[toId] !== undefined 
+                        ? Math.max(contextLevelMap[toId], desiredLevel)
+                        : desiredLevel;
+                }
+            });
+
+            nodesDataSet.add(kgData.nodes.map(node => {
+                const id = String(node.id);
+                const explicitLevel = nodeLevelMap[id] ?? contextLevelMap[id];
+                return explicitLevel !== undefined 
+                    ? ({ ...node, id, level: explicitLevel })
+                    : ({ ...node, id });
+            }));
             edgesDataSet.add(kgData.edges.map(e => ({...e, from: String(e.from), to: String(e.to), label: e.label || ''})));
 
             const options = {
-                 layout: { hierarchical: { enabled: true, levelSeparation: 180, nodeSpacing: 120, treeSpacing: 200, direction: 'LR', sortMethod: 'directed', shakeTowards: 'roots' } },
-                 interaction: { dragNodes: true, selectConnectedEdges: false, hover: false },
-                 physics: { enabled: false },
-                 nodes: { 
+                layout: { 
+                    hierarchical: { 
+                        enabled: true, 
+                        levelSeparation: 180, 
+                        nodeSpacing: 120,
+                        treeSpacing: 200, 
+                        direction: 'LR', 
+                        sortMethod: 'directed', 
+                        shakeTowards: 'roots',
+                        blockShifting: true, 
+                        edgeMinimization: true,
+                        parentCentralization: true 
+                    } 
+                },
+                interaction: { dragNodes: true, selectConnectedEdges: false, hover: false },
+                physics: {
+                    enabled: false,
+                },
+                nodes: { 
                     shape: 'circle',
                     margin: { top: 10, right: 10, bottom: 10, left: 10 },
                     font: { size: 11 } 
-                 },
-                 edges: {
-                     font: styles.edges.baseFont,
-                     arrows: 'to',
-                     smooth: { type: 'cubicBezier', forceDirection: 'horizontal', roundness: 0.4 },
-                     selectionWidth: 0,
-                     hoverWidth: 0
-                 }
+                },
+                edges: {
+                    font: styles.edges.baseFont,
+                    arrows: 'to',
+                    smooth: { 
+                        type: 'cubicBezier', 
+                        forceDirection: 'horizontal', 
+                        roundness: 0.4
+                    },
+                    selectionWidth: 0,
+                    hoverWidth: 0
+                }
             };
 
             network = new vis.Network(kgContainer, { nodes: nodesDataSet, edges: edgesDataSet }, options);
